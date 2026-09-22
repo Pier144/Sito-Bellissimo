@@ -117,23 +117,6 @@
     0%, 100% { transform: scale(1); }
     50%      { transform: scale(1.03); } /* oltre, la scritta rischia di uscire dai bordi */
   }
-  #escape {
-    position: fixed;
-    left: 50%;
-    bottom: 22px;
-    transform: translateX(-50%);
-    z-index: 10000;
-    display: none;
-    padding: 11px 20px;
-    border: 0;
-    border-radius: 99px;
-    background: rgba(255,255,255,.92);
-    color: #1d2733;
-    font: 600 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0,0,0,.35);
-  }
-  #escape.on { display: block; }
 </style>
 </head>
 <body>
@@ -156,7 +139,7 @@
 <div id="blast" aria-hidden="true">
   <img src="assets/v.gif" alt="">
 </div>
-<button id="escape" type="button">ok basta 😭</button>
+<audio id="snd" src="assets/boom.mp3" preload="auto" loop></audio>
 
 <script>
 (function () {
@@ -169,89 +152,70 @@
   var fillEl = document.getElementById('fill');
   var statusEl = document.getElementById('status');
   var blastEl = document.getElementById('blast');
-  var escapeEl = document.getElementById('escape');
 
-  /* --- audio: costruito al volo, niente file esterni --- */
-  var ctx = null, nodes = [], master = null;
+  /* --- audio: mp3 nel repo, spinto oltre il 100% con WebAudio --- */
+  var sndEl = document.getElementById('snd');
+  var ctx = null, srcNode = null, boost = null;
+  var blasting = false;   // lo sblocco non deve mettere in pausa il blast gia' partito
 
   function unlockAudio() {
-    if (ctx) return;
-    var AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    ctx = new AC();
-    if (ctx.state === 'suspended') ctx.resume();
-  }
-
-  function distortionCurve(amount) {
-    var n = 2048, curve = new Float32Array(n);
-    for (var i = 0; i < n; i++) {
-      var x = (i * 2) / n - 1;
-      curve[i] = ((3 + amount) * x * 20 * Math.PI / 180) / (Math.PI + amount * Math.abs(x));
+    // il primo click serve a sbloccare: i browser (iOS in testa) pretendono
+    // che un play() parta da un gesto dell'utente, se no al 30esimo resta muto
+    if (!ctx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) ctx = new AC();
     }
-    return curve;
-  }
-
-  function noiseBuffer() {
-    var len = ctx.sampleRate * 2;
-    var buf = ctx.createBuffer(1, len, ctx.sampleRate);
-    var d = buf.getChannelData(0);
-    for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-    return buf;
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+    if (sndEl && !sndEl.dataset.unlocked) {
+      sndEl.dataset.unlocked = '1';
+      sndEl.muted = true;
+      var pr = sndEl.play();
+      if (pr && pr.then) {
+        pr.then(function () {
+          sndEl.muted = false;
+          if (blasting) return;   // altrimenti la pausa qui sotto ammazza l'audio buono
+          sndEl.pause();
+          sndEl.currentTime = 0;
+        }).catch(function () { sndEl.muted = false; });
+      } else {
+        sndEl.pause(); sndEl.currentTime = 0; sndEl.muted = false;
+      }
+    }
   }
 
   function blastAudio() {
-    if (!ctx) unlockAudio();
-    if (!ctx) return;
-    if (ctx.state === 'suspended') ctx.resume();
+    if (!sndEl) return;
+    blasting = true;
+    unlockAudio();
 
-    var t = ctx.currentTime;
+    // il gain a 4 supera il volume massimo normale di un tag <audio>:
+    // satura un po', ed e' esattamente quello che vogliamo
+    if (ctx && !srcNode) {
+      try {
+        srcNode = ctx.createMediaElementSource(sndEl);
+        boost = ctx.createGain();
+        boost.gain.value = 4;
+        srcNode.connect(boost);
+        boost.connect(ctx.destination);
+      } catch (e) { srcNode = null; }
+    }
+    if (ctx && ctx.state === 'suspended') ctx.resume();
 
-    master = ctx.createGain();
-    master.gain.setValueAtTime(0.0001, t);
-    master.gain.exponentialRampToValueAtTime(1, t + 0.05);
-
-    var shaper = ctx.createWaveShaper();
-    shaper.curve = distortionCurve(400);
-    shaper.oversample = '4x';
-    shaper.connect(master);
-    master.connect(ctx.destination);
-
-    // tre oscillatori sfasati -> battimenti sgradevoli
-    [110, 113.7, 220.5].forEach(function (f) {
-      var o = ctx.createOscillator();
-      o.type = 'sawtooth';
-      o.frequency.setValueAtTime(f, t);
-      // sirena: su e giù all'infinito
-      var lfo = ctx.createOscillator();
-      lfo.type = 'triangle';
-      lfo.frequency.value = 2.7;
-      var depth = ctx.createGain();
-      depth.gain.value = f * 0.6;
-      lfo.connect(depth);
-      depth.connect(o.frequency);
-      o.connect(shaper);
-      o.start(t); lfo.start(t);
-      nodes.push(o, lfo);
-    });
-
-    // rumore bianco sopra a tutto
-    var noise = ctx.createBufferSource();
-    noise.buffer = noiseBuffer();
-    noise.loop = true;
-    var ng = ctx.createGain();
-    ng.gain.value = 0.55;
-    noise.connect(ng); ng.connect(shaper);
-    noise.start(t);
-    nodes.push(noise);
+    sndEl.muted = false;
+    sndEl.volume = 1;
+    sndEl.currentTime = 0;
+    sndEl.loop = true;
+    var p = sndEl.play();
+    if (p && p.catch) p.catch(function () {});
   }
 
   function stopAudio() {
-    if (!ctx) return;
+    blasting = false;
+    if (!sndEl) return;
     try {
-      if (master) master.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
-      nodes.forEach(function (n) { try { n.stop(ctx.currentTime + 0.15); } catch (e) {} });
+      sndEl.pause();
+      sndEl.currentTime = 0;
     } catch (e) {}
-    nodes = [];
   }
 
   /* --- barra di avanzamento: rallenta verso la fine --- */
@@ -279,20 +243,17 @@
     goFullscreen();
     blastEl.classList.add('on');
     blastAudio();
-    setTimeout(function () {
-      canStop = true;
-      escapeEl.classList.add('on');
-    }, 4000);
+    // nessun pulsante visibile: dopo 4s un click o un tasto qualsiasi ferma tutto
+    setTimeout(function () { canStop = true; }, 4000);
   }
 
   function stopAll() {
     stopAudio();
     blastEl.classList.remove('on');
-    escapeEl.classList.remove('on');
     if (document.fullscreenElement && document.exitFullscreen) {
       document.exitFullscreen().catch(function () {});
     }
-    statusEl.textContent = 'Ti ho fregata 😌';
+    statusEl.textContent = '';
     document.body.style.cursor = 'default';
   }
 
@@ -312,7 +273,6 @@
     if (fired && canStop) { stopAll(); return; }
     if (!fired && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); onPress(e); }
   });
-  escapeEl.addEventListener('click', function (e) { e.stopPropagation(); stopAll(); });
   document.addEventListener('contextmenu', function (e) { if (fired) e.preventDefault(); });
 
   paint();
