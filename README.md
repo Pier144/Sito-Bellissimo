@@ -1,4 +1,4 @@
-# Sito-Meme
+# Sito-Bellissimo
 
 Scherzo tra amici. Finta "verifica di sicurezza": dopo 30 click parte la
 sorpresa a tutto schermo con l'audio in loop a volume pieno.
