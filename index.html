@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Verifica di sicurezza</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root {
+    --bg: #eef1f5;
+    --card: #ffffff;
+    --ink: #1d2733;
+    --muted: #6b7785;
+    --line: #dfe4ea;
+    --accent: #2f6fdb;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    cursor: pointer;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 28px 24px 24px;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(16,24,40,.06), 0 8px 24px rgba(16,24,40,.06);
+  }
+  .shield {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 14px;
+    display: block;
+    color: var(--accent);
+  }
+  h1 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    letter-spacing: -.01em;
+  }
+  p.sub {
+    margin: 0 0 22px;
+    color: var(--muted);
+    font-size: 13.5px;
+  }
+  .count {
+    font-size: 34px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.02em;
+  }
+  .count span { color: var(--muted); font-size: 18px; font-weight: 500; }
+  .bar {
+    height: 6px;
+    background: var(--line);
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 14px 0 12px;
+  }
+  .fill {
+    height: 100%;
+    width: 0;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width .18s ease-out;
+  }
+  .status {
+    font-size: 12.5px;
+    color: var(--muted);
+    min-height: 18px;
+  }
+  .foot {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+    color: #9aa4b0;
+  }
+
+  /* --- il colpo --- */
+  #blast {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: none;
+    z-index: 9999;
+    cursor: default;
+  }
+  #blast.on { display: block; }
+  #blast img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* la gif è quadrata: 'cover' taglierebbe la scritta sugli schermi larghi */
+    image-rendering: pixelated;
+    animation: pulse 1.1s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.03); } /* oltre, la scritta rischia di uscire dai bordi */
+  }
+  #escape {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    z-index: 10000;
+    display: none;
+    padding: 11px 20px;
+    border: 0;
+    border-radius: 99px;
+    background: rgba(255,255,255,.92);
+    color: #1d2733;
+    font: 600 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,.35);
+  }
+  #escape.on { display: block; }
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <svg class="shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+    <path d="M9 12l2 2 4-4"></path>
+  </svg>
+  <h1>Verifica di sicurezza</h1>
+  <p class="sub">Per continuare, conferma di non essere un bot.<br>Clicca <strong>30 volte</strong> in un punto qualsiasi dello schermo.</p>
+
+  <div class="count"><b id="n">0</b><span> / 30</span></div>
+  <div class="bar"><div class="fill" id="fill"></div></div>
+  <div class="status" id="status">In attesa del primo click…</div>
+
+  <div class="foot">ID sessione 8F2C-41A9 · Protezione anti-automazione</div>
+</div>
+
+<div id="blast" aria-hidden="true">
+  <img src="assets/v.gif" alt="">
+</div>
+<button id="escape" type="button">ok basta 😭</button>
+
+<script>
+(function () {
+  var TARGET = 30;
+  var clicks = 0;
+  var fired = false;
+  var canStop = false;
+
+  var nEl = document.getElementById('n');
+  var fillEl = document.getElementById('fill');
+  var statusEl = document.getElementById('status');
+  var blastEl = document.getElementById('blast');
+  var escapeEl = document.getElementById('escape');
+
+  /* --- audio: costruito al volo, niente file esterni --- */
+  var ctx = null, nodes = [], master = null;
+
+  function unlockAudio() {
+    if (ctx) return;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    ctx = new AC();
+    if (ctx.state === 'suspended') ctx.resume();
+  }
+
+  function distortionCurve(amount) {
+    var n = 2048, curve = new Float32Array(n);
+    for (var i = 0; i < n; i++) {
+      var x = (i * 2) / n - 1;
+      curve[i] = ((3 + amount) * x * 20 * Math.PI / 180) / (Math.PI + amount * Math.abs(x));
+    }
+    return curve;
+  }
+
+  function noiseBuffer() {
+    var len = ctx.sampleRate * 2;
+    var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    var d = buf.getChannelData(0);
+    for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    return buf;
+  }
+
+  function blastAudio() {
+    if (!ctx) unlockAudio();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    var t = ctx.currentTime;
+
+    master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, t);
+    master.gain.exponentialRampToValueAtTime(1, t + 0.05);
+
+    var shaper = ctx.createWaveShaper();
+    shaper.curve = distortionCurve(400);
+    shaper.oversample = '4x';
+    shaper.connect(master);
+    master.connect(ctx.destination);
+
+    // tre oscillatori sfasati -> battimenti sgradevoli
+    [110, 113.7, 220.5].forEach(function (f) {
+      var o = ctx.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(f, t);
+      // sirena: su e giù all'infinito
+      var lfo = ctx.createOscillator();
+      lfo.type = 'triangle';
+      lfo.frequency.value = 2.7;
+      var depth = ctx.createGain();
+      depth.gain.value = f * 0.6;
+      lfo.connect(depth);
+      depth.connect(o.frequency);
+      o.connect(shaper);
+      o.start(t); lfo.start(t);
+      nodes.push(o, lfo);
+    });
+
+    // rumore bianco sopra a tutto
+    var noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer();
+    noise.loop = true;
+    var ng = ctx.createGain();
+    ng.gain.value = 0.55;
+    noise.connect(ng); ng.connect(shaper);
+    noise.start(t);
+    nodes.push(noise);
+  }
+
+  function stopAudio() {
+    if (!ctx) return;
+    try {
+      if (master) master.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+      nodes.forEach(function (n) { try { n.stop(ctx.currentTime + 0.15); } catch (e) {} });
+    } catch (e) {}
+    nodes = [];
+  }
+
+  /* --- barra di avanzamento: rallenta verso la fine --- */
+  function paint() {
+    nEl.textContent = clicks;
+    var r = clicks / TARGET;
+    fillEl.style.width = (Math.pow(r, 1.7) * 100).toFixed(1) + '%';
+
+    if (clicks === 0)          statusEl.textContent = 'In attesa del primo click…';
+    else if (clicks < 10)      statusEl.textContent = 'Analisi del comportamento in corso…';
+    else if (clicks < 20)      statusEl.textContent = 'Confronto con i modelli noti…';
+    else if (clicks < 25)      statusEl.textContent = 'Quasi fatto, continua…';
+    else if (clicks < TARGET)  statusEl.textContent = 'Ultimi controlli… non fermarti adesso!';
+  }
+
+  function goFullscreen() {
+    var el = document.documentElement;
+    var fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    if (fn) { try { fn.call(el).catch(function () {}); } catch (e) {} }
+  }
+
+  function fire() {
+    fired = true;
+    statusEl.textContent = 'Verifica completata.';
+    goFullscreen();
+    blastEl.classList.add('on');
+    blastAudio();
+    setTimeout(function () {
+      canStop = true;
+      escapeEl.classList.add('on');
+    }, 4000);
+  }
+
+  function stopAll() {
+    stopAudio();
+    blastEl.classList.remove('on');
+    escapeEl.classList.remove('on');
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(function () {});
+    }
+    statusEl.textContent = 'Ti ho fregata 😌';
+    document.body.style.cursor = 'default';
+  }
+
+  function onPress(e) {
+    if (fired) {
+      if (canStop) { e.preventDefault(); stopAll(); }
+      return;
+    }
+    unlockAudio();           // il primo click sblocca l'audio: i browser lo richiedono
+    clicks++;
+    paint();
+    if (clicks >= TARGET) fire();
+  }
+
+  document.addEventListener('pointerdown', onPress);
+  document.addEventListener('keydown', function (e) {
+    if (fired && canStop) { stopAll(); return; }
+    if (!fired && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); onPress(e); }
+  });
+  escapeEl.addEventListener('click', function (e) { e.stopPropagation(); stopAll(); });
+  document.addEventListener('contextmenu', function (e) { if (fired) e.preventDefault(); });
+
+  paint();
+})();
+</script>
+</body>
+</html>
