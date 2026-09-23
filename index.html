@@ -3,279 +3,756 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Verifica di sicurezza</title>
+<title>🎁 HAI VINTO!!! Ritira il tuo premio 🎁</title>
 <meta name="robots" content="noindex, nofollow">
 <style>
   :root {
-    --bg: #eef1f5;
-    --card: #ffffff;
-    --ink: #1d2733;
-    --muted: #6b7785;
-    --line: #dfe4ea;
-    --accent: #2f6fdb;
+    --red: #e10600;
+    --yellow: #ffe600;
+    --green: #16a300;
+    --ink: #111;
   }
   * { box-sizing: border-box; }
-  html, body {
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
+  html, body { margin: 0; overflow-x: hidden; }
+  body {
+    min-height: 100vh;
+    color: var(--ink);
+    font: 16px/1.4 "Comic Sans MS", "Comic Sans", "Chalkboard SE", "Comic Neue", cursive;
+    background: repeating-linear-gradient(45deg, #fff200 0 22px, #ffd900 22px 44px);
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-  }
-  body {
-    background: var(--bg);
-    color: var(--ink);
-    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    cursor: pointer;
+    padding-bottom: 40px;
   }
 
-  .card {
-    width: 100%;
-    max-width: 420px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 28px 24px 24px;
-    text-align: center;
-    box-shadow: 0 1px 2px rgba(16,24,40,.06), 0 8px 24px rgba(16,24,40,.06);
-  }
-  .shield {
-    width: 40px;
-    height: 40px;
-    margin: 0 auto 14px;
-    display: block;
-    color: var(--accent);
-  }
-  h1 {
-    font-size: 17px;
-    font-weight: 600;
-    margin: 0 0 6px;
-    letter-spacing: -.01em;
-  }
-  p.sub {
-    margin: 0 0 22px;
-    color: var(--muted);
-    font-size: 13.5px;
-  }
-  .count {
-    font-size: 34px;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -.02em;
-  }
-  .count span { color: var(--muted); font-size: 18px; font-weight: 500; }
-  .bar {
-    height: 6px;
-    background: var(--line);
-    border-radius: 99px;
+  /* --- striscia vincitori in alto --- */
+  .ticker {
+    background: var(--red);
+    color: #fff;
+    font-weight: bold;
+    white-space: nowrap;
     overflow: hidden;
-    margin: 14px 0 12px;
+    border-bottom: 3px dashed var(--yellow);
+    padding: 6px 0;
   }
-  .fill {
-    height: 100%;
-    width: 0;
-    background: var(--accent);
+  .ticker span {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll 28s linear infinite;
+  }
+  @keyframes scroll { to { transform: translateX(-100%); } }
+
+  .screen { display: none; padding: 16px; }
+  .screen.on { display: block; }
+
+  .box {
+    max-width: 520px;
+    margin: 14px auto 0;
+    background: #fff;
+    border: 5px dashed var(--red);
+    border-radius: 14px;
+    padding: 20px 16px;
+    text-align: center;
+    box-shadow: 6px 6px 0 rgba(0,0,0,.35);
+  }
+  .step {
+    display: inline-block;
+    background: #000;
+    color: var(--yellow);
+    font-size: 12px;
+    padding: 2px 10px;
     border-radius: 99px;
-    transition: width .18s ease-out;
+    margin-bottom: 8px;
   }
-  .status {
-    font-size: 12.5px;
-    color: var(--muted);
-    min-height: 18px;
+  h1, h2 { margin: 4px 0 10px; line-height: 1.15; }
+  h1 { font-size: 30px; color: var(--red); text-shadow: 2px 2px 0 var(--yellow), 4px 4px 0 #000; }
+  h2 { font-size: 22px; }
+  .blink { animation: blink .8s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .rainbow { animation: rainbow 1.2s linear infinite; }
+  @keyframes rainbow {
+    0%   { color: #e10600; } 25% { color: #ff00c8; }
+    50%  { color: #0047ff; } 75% { color: #16a300; } 100% { color: #e10600; }
   }
-  .foot {
-    margin-top: 20px;
-    padding-top: 14px;
-    border-top: 1px solid var(--line);
-    font-size: 11px;
-    color: #9aa4b0;
+  .big { font-size: 20px; }
+  .tiny { font-size: 9px; color: #777; line-height: 1.3; margin-top: 12px; }
+
+  .prizes { list-style: none; padding: 0; margin: 14px 0; text-align: left; }
+  .prizes li {
+    border: 3px solid #000;
+    background: #fffbe0;
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin: 6px 0;
+    font-weight: bold;
+    font-size: 17px;
+  }
+  .prizes li small { font-weight: normal; color: var(--red); }
+
+  .timer { font-size: 18px; margin: 10px 0; }
+  .timer b { color: #fff; background: var(--red); padding: 2px 8px; border-radius: 6px; font-variant-numeric: tabular-nums; }
+
+  .cta {
+    font: inherit;
+    font-size: 22px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(#26d000, #128a00);
+    border: 4px solid #000;
+    border-radius: 14px;
+    padding: 14px 22px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #000;
+    animation: pump 1s ease-in-out infinite;
+  }
+  .cta:active { transform: translateY(4px); box-shadow: 0 2px 0 #000; }
+  .cta[disabled] { filter: grayscale(1); animation: none; cursor: default; }
+  @keyframes pump { 50% { transform: scale(1.06); } }
+
+  .badges { margin-top: 14px; font-size: 13px; font-weight: bold; color: var(--green); }
+  .reviews { text-align: left; font-size: 13px; margin-top: 14px; border-top: 2px dotted #aaa; padding-top: 8px; }
+  .reviews p { margin: 6px 0; }
+
+  /* --- ruota --- */
+  .wheel-wrap { position: relative; width: min(78vw, 320px); aspect-ratio: 1; margin: 22px auto 14px; }
+  .pointer {
+    position: absolute; top: -16px; left: 50%; z-index: 2;
+    transform: translateX(-50%);
+    border-left: 16px solid transparent; border-right: 16px solid transparent;
+    border-top: 32px solid #000;
+  }
+  .wheel {
+    position: relative;
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    border: 8px solid var(--red);
+    box-shadow: 0 0 0 4px #000;
+  }
+  .wheel::after {
+    content: "★";
+    position: absolute; left: 50%; top: 50%;
+    width: 44px; height: 44px; margin: -22px 0 0 -22px;
+    border-radius: 50%; background: #000; color: var(--yellow);
+    font-size: 26px; line-height: 44px; text-align: center;
+  }
+  .lab {
+    position: absolute; left: 50%; top: 50%;
+    width: 50%; height: 22px; margin-top: -11px;
+    transform-origin: 0 50%;
+    text-align: right; padding-right: 10px;
+    font-size: 13px; font-weight: bold; white-space: nowrap;
+  }
+  .msg { min-height: 30px; font-size: 20px; font-weight: bold; margin: 8px 0; }
+
+  /* --- captcha --- */
+  .captcha { max-width: 340px; margin: 0 auto; border: 2px solid #ccc; background: #fff; text-align: left; }
+  .captcha-head { background: #2a73e8; color: #fff; padding: 14px 12px; font-family: Arial, sans-serif; font-size: 15px; }
+  .captcha-head b { font-size: 24px; display: block; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; }
+  .tile {
+    position: relative;
+    aspect-ratio: 1;
+    border: 0; padding: 0; cursor: pointer;
+    background: #ddd center / cover no-repeat;
+    transition: transform .12s;
+  }
+  .tile.sel { transform: scale(.84); }
+  .tile.sel::after {
+    content: "✓";
+    position: absolute; top: -6px; left: -6px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #2a73e8; color: #fff;
+    font: bold 16px/26px Arial, sans-serif; text-align: center;
+  }
+  .captcha-foot { display: flex; justify-content: flex-end; padding: 8px; border-top: 1px solid #ddd; }
+  .captcha-foot button {
+    font: bold 14px Arial, sans-serif; color: #fff; background: #2a73e8;
+    border: 0; border-radius: 3px; padding: 10px 20px; cursor: pointer;
   }
 
-  /* --- il colpo --- */
-  #blast {
-    position: fixed;
-    inset: 0;
-    background: #000;
-    display: none;
-    z-index: 9999;
-    cursor: default;
+  /* --- termini --- */
+  .dialog { max-width: 440px; margin: 20px auto 0; background: #fff; border: 4px solid #000; border-radius: 10px; box-shadow: 8px 8px 0 rgba(0,0,0,.4); text-align: left; }
+  .dialog-head { background: #000; color: var(--yellow); padding: 10px 14px; font-weight: bold; display: flex; justify-content: space-between; gap: 10px; }
+  .dialog-body { padding: 18px 16px; }
+  .clause { font-size: 20px; font-weight: bold; margin: 0 0 8px; }
+  .fine { font-size: 8px; color: #999; line-height: 1.25; margin: 10px 0 0; }
+  .err { color: var(--red); font-size: 14px; min-height: 20px; margin: 6px 0 0; font-weight: bold; }
+  .dialog-foot { display: flex; justify-content: flex-end; align-items: center; gap: 12px; padding: 12px 16px; border-top: 2px dashed #ccc; }
+  .no {
+    font: inherit; background: #ddd; color: #555; border: 1px solid #aaa; border-radius: 6px;
+    padding: .4em .9em; cursor: pointer; transition: font-size .3s;
   }
-  #blast.on { display: block; }
-  #blast img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* la gif è quadrata: 'cover' taglierebbe la scritta sugli schermi larghi */
-    image-rendering: pixelated;
-    animation: pulse 1.1s ease-in-out infinite;
+  .yes {
+    font: inherit; font-weight: bold; color: #fff; background: var(--green);
+    border: 3px solid #000; border-radius: 10px; padding: 10px 18px; cursor: pointer;
+    transition: font-size .3s;
   }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50%      { transform: scale(1.03); } /* oltre, la scritta rischia di uscire dai bordi */
+  .legal {
+    height: 55vh;
+    overflow-y: auto;
+    padding: 12px 14px;
+    background: #fbfbf8;
+    font: 11px/1.45 "Times New Roman", Times, serif;
+    text-align: justify;
+    color: #333;
   }
+  .legal h3 { font-size: 12px; text-align: center; margin: 0 0 10px; }
+  .legal h4 { font-size: 11px; margin: 12px 0 4px; text-transform: uppercase; }
+  .legal p { margin: 0 0 5px; }
+  .legal .sign { margin-top: 16px; font-style: italic; text-align: right; }
+  .yes[disabled] { background: #999; cursor: default; }
+  .shake { animation: shake .35s; }
+  @keyframes shake {
+    20% { transform: translateX(-10px); } 40% { transform: translateX(10px); }
+    60% { transform: translateX(-6px); }  80% { transform: translateX(6px); }
+  }
+  .pop { animation: pop .25s ease-out; }
+  @keyframes pop { from { transform: scale(.85); opacity: .3; } }
+
+  /* --- pulsante che scappa --- */
+  #run { position: relative; z-index: 50; margin-top: 16px; white-space: nowrap; max-width: calc(100vw - 20px); }
+  #run.loose { position: fixed; margin: 0; transition: left .16s ease-out, top .16s ease-out; }
+  #run.tired { animation: none; }
+
+  /* --- finale --- */
+  .count { font-size: 44px; font-weight: bold; color: var(--red); min-height: 60px; }
+  .paid { display: none; }
+  .paid.on { display: block; animation: pop .3s ease-out; }
+  .ok { font-size: 28px; color: var(--green); font-weight: bold; margin: 6px 0; }
+  .amount { font-size: 54px; font-weight: bold; color: var(--red); margin: 4px 0 12px; }
+  .receipt { text-align: left; font-family: "Courier New", monospace; font-size: 14px; border-top: 2px dashed #000; border-bottom: 2px dashed #000; padding: 8px 0; }
+  .receipt div { display: flex; justify-content: space-between; gap: 10px; }
+
+  /* --- notifica finti vincitori --- */
+  .toast {
+    position: fixed; left: 12px; bottom: 12px; z-index: 40;
+    max-width: 290px;
+    background: #fff; border: 3px solid #000; border-radius: 10px;
+    padding: 8px 12px; font-size: 13px;
+    box-shadow: 4px 4px 0 rgba(0,0,0,.35);
+    transform: translateY(160%); transition: transform .35s;
+  }
+  .toast.on { transform: none; }
+  .toast i { color: #888; font-size: 11px; }
+
+  .fall {
+    position: fixed; top: -60px; z-index: 60; pointer-events: none;
+    animation: fall linear forwards;
+  }
+  @keyframes fall { to { transform: translateY(115vh) rotate(720deg); } }
 </style>
 </head>
 <body>
 
-<div class="card" id="card">
-  <svg class="shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-    <path d="M9 12l2 2 4-4"></path>
-  </svg>
-  <h1>Verifica di sicurezza</h1>
-  <p class="sub">Per continuare, conferma di non essere un bot.<br>Clicca <strong>30 volte</strong> in un punto qualsiasi dello schermo.</p>
+<div class="ticker"><span id="ticker"></span></div>
 
-  <div class="count"><b id="n">0</b><span> / 30</span></div>
-  <div class="bar"><div class="fill" id="fill"></div></div>
-  <div class="status" id="status">In attesa del primo click…</div>
+<!-- 0. landing -->
+<section class="screen on" id="s0">
+  <div class="box">
+    <div class="step">🔒 CONNESSIONE SICURA AL 100%</div>
+    <h1 class="blink">🎉 CONGRATULAZIONI!!! 🎉</h1>
+    <p class="big">Sei il <b class="rainbow">VISITATORE N° 1.000.000</b>!!!</p>
+    <p>Il tuo dispositivo è stato <b>SELEZIONATO</b> per ricevere uno di questi <b>PREMI ESCLUSIVI</b>:</p>
+    <ul class="prizes">
+      <li>📱 iPhone 17 Pro Max <small>(1 TB!!!)</small></li>
+      <li>🎮 PlayStation 6 <small>(non ancora uscita!!!)</small></li>
+      <li>💶 Buono spesa da 1000€</li>
+      <li>🏎️ Lamborghini</li>
+    </ul>
+    <p class="timer">⏰ L'offerta scade tra <b id="timer">04:59</b></p>
+    <button class="cta" data-go="1">👉 RITIRA IL PREMIO 👈</button>
+    <div class="badges">✔️ 100% GRATIS ✔️ VERIFICATO ✔️ NON È UNA TRUFFA</div>
+    <div class="reviews">
+      <p>⭐⭐⭐⭐⭐ <b>Marco R.</b>: "Ho ricevuto il mio iPhone ieri, grazie!!!"</p>
+      <p>⭐⭐⭐⭐⭐ <b>Giulia T.</b>: "All'inizio non ci credevo, ora non ci credo ancora"</p>
+      <p>⭐⭐⭐⭐⭐ <b>Utente1847</b>: "Sito serio e affidabile. Lo dice anche il sito."</p>
+    </div>
+  </div>
+</section>
 
-  <div class="foot">ID sessione 8F2C-41A9 · Protezione anti-automazione</div>
-</div>
+<!-- 1. ruota truccata -->
+<section class="screen" id="s1">
+  <div class="box">
+    <div class="step">PASSAGGIO 1 DI 4</div>
+    <h2>🎡 GIRA LA RUOTA E SCOPRI IL TUO PREMIO!!!</h2>
+    <div class="wheel-wrap">
+      <div class="pointer"></div>
+      <div class="wheel" id="wheel"></div>
+    </div>
+    <div class="msg" id="wheelMsg"></div>
+    <button class="cta" id="spin">🍀 GIRA LA RUOTA 🍀</button>
+    <button class="cta" id="afterSpin" data-go="2" hidden>CONTINUA ➡️</button>
+  </div>
+</section>
 
-<div id="blast" aria-hidden="true">
-  <img src="assets/v.gif" alt="">
-</div>
-<audio id="snd" src="assets/boom.mp3" preload="auto" loop></audio>
+<!-- 2. finto captcha -->
+<section class="screen" id="s2">
+  <div class="box">
+    <div class="step">PASSAGGIO 2 DI 4</div>
+    <h2>🤖 Dimostra di non essere un robot</h2>
+    <div class="captcha">
+      <div class="captcha-head">Seleziona tutte le immagini che contengono un <b>iPhone</b></div>
+      <div class="grid" id="grid"></div>
+      <div class="captcha-foot"><button id="verify">VERIFICA</button></div>
+    </div>
+    <div class="msg" id="capMsg"></div>
+  </div>
+</section>
+
+<!-- 3. termini e condizioni -->
+<section class="screen" id="s3">
+  <div class="dialog" id="tos">
+    <div class="dialog-head"><span>📜 Termini e Condizioni Generali</span><span>v. 47.3</span></div>
+    <div class="legal" id="legal">
+      <h3>TERMINI E CONDIZIONI GENERALI DI PARTECIPAZIONE AL CONCORSO A PREMI "VISITATORE N° 1.000.000"</h3>
+
+      <h4>Premesse</h4>
+      <p>Le presenti Condizioni Generali (di seguito, le "Condizioni") disciplinano i rapporti tra la società Premi Sicuri Veramente S.r.l.s. unipersonale in liquidazione, con sede legale in luogo non meglio precisato, capitale sociale sottoscritto e interamente versato pari a € 3,50 (tre/50) (di seguito, il "Promotore"), e qualsivoglia persona fisica, persona giuridica, animale domestico o entità senziente che acceda, anche accidentalmente, anche per errore, anche solo per curiosità, al presente sito (di seguito, il "Partecipante"). Le premesse costituiscono parte integrante e sostanziale delle presenti Condizioni. Anche questa frase.</p>
+
+      <h4>Art. 1 – Definizioni</h4>
+      <p>1.1 Ai fini delle presenti Condizioni, i termini con iniziale maiuscola avranno il significato loro attribuito nel presente articolo, salvo che il contesto richieda diversamente, nel qual caso avranno il significato che il Promotore riterrà di volta in volta più opportuno.</p>
+      <p>1.2 "Premio": il bene o servizio che il Partecipante ritiene di aver vinto.</p>
+      <p>1.3 "Gratuito": aggettivo privo di valore giuridico, utilizzato a fini esclusivamente decorativi.</p>
+      <p>1.4 "Vincitore": ciascun visitatore del sito, senza eccezione alcuna.</p>
+      <p>1.5 "Visitatore n° 1.000.000": si veda la definizione di "Vincitore" di cui all'art. 1.4.</p>
+      <p>1.6 "Giorno Lavorativo": qualsiasi giorno in cui il Promotore abbia voglia di lavorare.</p>
+      <p>1.7 "Immediatamente": entro un termine ragionevole, a insindacabile giudizio del Promotore, comunque non inferiore a 18 (diciotto) mesi.</p>
+
+      <h4>Art. 2 – Oggetto</h4>
+      <p>2.1 Il Concorso ha ad oggetto l'assegnazione, a titolo apparentemente gratuito, dei Premi indicati nella pagina principale del sito, le cui immagini hanno valore puramente illustrativo e non costituiscono in alcun modo prova dell'esistenza dei Premi medesimi.</p>
+      <p>2.2 Il Promotore si riserva la facoltà di sostituire il Premio con altro bene di valore pari, inferiore o sensibilmente inferiore, ivi inclusi, a titolo meramente esemplificativo e non esaustivo: calzini spaiati, cover per telefoni non posseduti, portachiavi, buoni sconto scaduti, tuberi.</p>
+      <p>2.3 La Lamborghini di cui alla pagina principale è da intendersi in scala 1:64. Il Promotore non è tenuto a precisarlo altrove.</p>
+
+      <h4>Art. 3 – Requisiti di partecipazione</h4>
+      <p>3.1 Possono partecipare al Concorso tutti i soggetti in possesso dei seguenti requisiti: (i) un dispositivo elettronico funzionante; (ii) almeno un dito; (iii) un conto corrente.</p>
+      <p>3.2 Il requisito di cui al punto (iii) dell'art. 3.1 è da intendersi essenziale. I requisiti di cui ai punti (i) e (ii) sono da intendersi facoltativi.</p>
+      <p>3.3 Sono esclusi dal Concorso i dipendenti del Promotore, i loro familiari fino al quarto grado, i loro animali domestici e chiunque abbia letto per intero le presenti Condizioni.</p>
+
+      <h4>Art. 4 – Modalità di partecipazione</h4>
+      <p>4.1 La partecipazione avviene mediante il superamento delle prove di abilità predisposte dal Promotore, tra le quali, a titolo esemplificativo e non esaustivo, la rotazione della ruota della fortuna, la verifica di umanità e l'inseguimento del pulsante di riscatto.</p>
+      <p>4.2 L'esito della ruota della fortuna è determinato in maniera assolutamente casuale, mediante un algoritmo casuale certificato che produce sempre il medesimo risultato.</p>
+      <p>4.3 Il Partecipante riconosce che il pulsante di riscatto è dotato di libero arbitrio e che il Promotore non risponde in alcun modo dei suoi spostamenti.</p>
+      <p>4.4 La verifica di umanità si intende superata in ogni caso. Il Promotore non ha mai incontrato un robot che non abbia superato la verifica.</p>
+
+      <h4>Art. 5 – Consegna del Premio</h4>
+      <p>5.1 Il Premio sarà consegnato entro 4 (quattro) – 6 (sei) anni lavorativi, come definiti all'art. 1.6, decorrenti dalla data di effettiva ricezione del pagamento di cui all'art. 11.</p>
+      <p>5.2 La consegna avverrà presso l'indirizzo che il Promotore riterrà più comodo, non necessariamente coincidente con quello del Partecipante.</p>
+      <p>5.3 In caso di mancata consegna, il Premio si intenderà comunque consegnato a tutti gli effetti di legge.</p>
+
+      <h4>Art. 6 – Trattamento dei dati personali</h4>
+      <p>6.1 Ai sensi della normativa vigente, previgente e futura, il Partecipante acconsente al trattamento dei propri dati personali, ivi inclusi quelli che non ha fornito, per finalità di marketing, profilazione, divinazione e intrattenimento del personale del Promotore.</p>
+      <p>6.2 I dati potranno essere comunicati a terzi, quarti e quinti, nonché a chiunque ne faccia richiesta con sufficiente gentilezza.</p>
+      <p>6.3 Il Partecipante acconsente altresì a ricevere comunicazioni commerciali con frequenza non superiore a 47 (quarantasette) al giorno, festivi inclusi, per un periodo di tempo indeterminato e indeterminabile.</p>
+
+      <h4>Art. 7 – Obblighi del Partecipante</h4>
+      <p>7.1 Il Partecipante si impegna a non lamentarsi, sbuffare, alzare gli occhi al cielo o manifestare in qualsivoglia altra forma il proprio disappunto nei confronti del Promotore, dei suoi dipendenti o del presente sito.</p>
+      <p>7.2 Il Partecipante si impegna altresì a condividere il presente sito con almeno 10 (dieci) amici, scelti preferibilmente tra i più fiduciosi.</p>
+
+      <h4>Art. 8 – Obblighi del Promotore</h4>
+      <p>8.1 Nessuno.</p>
+
+      <h4>Art. 9 – Limitazione di responsabilità</h4>
+      <p>9.1 Il Promotore non risponde di alcunché, in nessun caso e per nessun motivo, nemmeno qualora la colpa sia palesemente sua.</p>
+      <p>9.2 Senza pregiudizio per la generalità di quanto precede, il Promotore declina ogni responsabilità per danni diretti, indiretti, collaterali, esistenziali ed estetici, per delusioni di qualsiasi entità e per la perdita di fiducia nel genere umano.</p>
+
+      <h4>Art. 10 – Garanzia</h4>
+      <p>10.1 Il Premio è coperto da garanzia della durata di 0 (zero) giorni.</p>
+      <p>10.2 La garanzia decade in ogni caso in seguito a utilizzo, apertura della confezione od osservazione prolungata del Premio.</p>
+
+      <h4>Art. 11 – Corrispettivo</h4>
+      <p>11.1 La partecipazione al Concorso è interamente gratuita.</p>
+      <p>11.2 In deroga a quanto previsto all'art. 11.1, il ritiro del Premio comporta l'acquisto del medesimo al prezzo di € 1.799,99 (millesettecentonovantanove/99), IVA esclusa, spese di spedizione escluse, spese di esclusione escluse.</p>
+      <p>11.3 L'importo di cui all'art. 11.2 sarà addebitato automaticamente al termine della procedura, senza ulteriore preavviso oltre al presente, che il Partecipante dichiara di aver letto e compreso.</p>
+      <p>11.4 Il Partecipante riconosce che l'art. 11.2 prevale sull'art. 11.1 e che l'art. 11.1 costituiva una mera formula di cortesia.</p>
+
+      <h4>Art. 12 – Diritto di recesso</h4>
+      <p>12.1 Il Partecipante può esercitare il diritto di recesso entro 14 (quattordici) secondi dalla conclusione del contratto, mediante raccomandata con ricevuta di ritorno in triplice copia, redatta in lingua latina, da inviarsi presso la sede legale di cui alle Premesse.</p>
+
+      <h4>Art. 13 – Rimborsi</h4>
+      <p>13.1 Non sono previsti rimborsi.</p>
+      <p>13.2 Si veda l'art. 13.1.</p>
+
+      <h4>Art. 14 – Modifiche</h4>
+      <p>14.1 Il Promotore si riserva il diritto di modificare le presenti Condizioni in qualunque momento, anche retroattivamente, anche mentre il Partecipante le sta leggendo.</p>
+      <p>14.2 Le presenti Condizioni potrebbero essere state modificate mentre il Partecipante leggeva l'art. 14.1.</p>
+
+      <h4>Art. 15 – Durata</h4>
+      <p>15.1 Il Concorso ha durata indeterminata, fermo restando che l'offerta scade tra 4 (quattro) minuti e 59 (cinquantanove) secondi, in ogni momento.</p>
+
+      <h4>Art. 16 – Forza maggiore</h4>
+      <p>16.1 Costituiscono causa di forza maggiore, a titolo esemplificativo e non esaustivo: eventi naturali, scioperi, pandemie, invasioni aliene, lunedì mattina, traffico in tangenziale, mancanza di voglia.</p>
+
+      <h4>Art. 17 – Clausole vessatorie</h4>
+      <p>17.1 Ai sensi e per gli effetti degli artt. 1341 e 1342 c.c., il Partecipante dichiara di aver letto attentamente e di approvare specificamente tutte le clausole delle presenti Condizioni, con particolare riferimento a quelle che non ha letto.</p>
+
+      <h4>Art. 18 – Nullità parziale</h4>
+      <p>18.1 L'eventuale nullità o inefficacia di una o più clausole non inficia la validità delle restanti, né in alcun caso quella dell'addebito di cui all'art. 11.2, che resta valido anche qualora tutte le altre clausole dovessero venire meno.</p>
+
+      <h4>Art. 19 – Legge applicabile e foro competente</h4>
+      <p>19.1 Le presenti Condizioni sono regolate dalla legge dello Stato che il Promotore sceglierà all'insorgere della controversia.</p>
+      <p>19.2 Per ogni controversia è competente in via esclusiva il Foro di un'isola non raggiungibile con mezzi pubblici.</p>
+
+      <h4>Art. 20 – Lingua</h4>
+      <p>20.1 In caso di discordanza tra la versione italiana e le versioni in altre lingue, prevale la versione in klingon.</p>
+
+      <h4>Art. 21 – Disposizioni finali</h4>
+      <p>21.1 L'eventuale tolleranza del Promotore non costituisce in alcun caso rinuncia ai diritti derivanti dalle presenti Condizioni.</p>
+      <p>21.2 Il Partecipante dichiara di essere giunto fin qui leggendo attentamente ogni singola parola, e non scorrendo velocemente con il pollice.</p>
+      <p>21.3 Complimenti.</p>
+
+      <p class="sign">Letto, confermato e sottoscritto (virtualmente, ma vale lo stesso).</p>
+    </div>
+    <div class="dialog-foot">
+      <button class="yes" id="tosOk" disabled>⬇️ Scorri fino in fondo</button>
+    </div>
+  </div>
+
+  <div class="dialog" id="dialog" hidden>
+    <div class="dialog-head"><span>📜 Termini e Condizioni</span><span id="clauseN"></span></div>
+    <div class="dialog-body">
+      <p class="clause" id="clause"></p>
+      <p class="fine" id="fine" hidden>Cliccando "Accetto" l'utente dichiara di acquistare il premio al prezzo di 1799,99€ (IVA esclusa), rinunciando a qualsiasi rimborso, ripensamento, lamentela o sospiro.</p>
+      <p class="err" id="err"></p>
+    </div>
+    <div class="dialog-foot">
+      <button class="no" id="no">Rifiuta</button>
+      <button class="yes" id="yes">✅ ACCETTO</button>
+    </div>
+  </div>
+</section>
+
+<!-- 4. pulsante che scappa -->
+<section class="screen" id="s4">
+  <div class="box">
+    <div class="step">PASSAGGIO 4 DI 4 — ULTIMO!!!</div>
+    <h2>🏁 Ci sei quasi!!!</h2>
+    <p>Clicca il pulsante qui sotto per riscattare il tuo <b>iPhone 17 Pro Max</b>.</p>
+    <div class="msg" id="runMsg"></div>
+    <button class="cta" id="run">💰 RISCATTA ORA 💰</button>
+  </div>
+</section>
+
+<!-- 5. finale -->
+<section class="screen" id="s5">
+  <div class="box">
+    <h2>🙏 Grazie per il suo acquisto!</h2>
+    <p class="big">I <b>1799,99€</b> verranno scalati dal suo conto in</p>
+    <div class="count" id="count"></div>
+    <div class="paid" id="paid">
+      <div class="ok">✅ PAGAMENTO COMPLETATO</div>
+      <div class="amount">−1799,99€</div>
+      <div class="receipt">
+        <div><span>Ordine</span><span id="order"></span></div>
+        <div><span>Articolo</span><span>1× Premio GRATUITO</span></div>
+        <div><span>Spedizione</span><span>4-6 anni lavorativi</span></div>
+        <div><span>Rimborsabile</span><span>No 🙂</span></div>
+      </div>
+      <p class="tiny">Grazie per aver scelto la nostra azienda seria e affidabile.</p>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+<audio id="snd" src="assets/kaching.mp3" preload="auto"></audio>
 
 <script>
 (function () {
-  var TARGET = 30;
-  var clicks = 0;
-  var fired = false;
-  var canStop = false;
-
-  var nEl = document.getElementById('n');
-  var fillEl = document.getElementById('fill');
-  var statusEl = document.getElementById('status');
-  var blastEl = document.getElementById('blast');
-
-  /* --- audio: mp3 nel repo, spinto oltre il 100% con WebAudio --- */
-  var sndEl = document.getElementById('snd');
-  var ctx = null, srcNode = null, boost = null;
-  var blasting = false;   // lo sblocco non deve mettere in pausa il blast gia' partito
-
-  function unlockAudio() {
-    // il primo click serve a sbloccare: i browser (iOS in testa) pretendono
-    // che un play() parta da un gesto dell'utente, se no al 30esimo resta muto
-    if (!ctx) {
-      var AC = window.AudioContext || window.webkitAudioContext;
-      if (AC) ctx = new AC();
-    }
-    if (ctx && ctx.state === 'suspended') ctx.resume();
-    if (sndEl && !sndEl.dataset.unlocked) {
-      sndEl.dataset.unlocked = '1';
-      sndEl.muted = true;
-      var pr = sndEl.play();
-      if (pr && pr.then) {
-        pr.then(function () {
-          sndEl.muted = false;
-          if (blasting) return;   // altrimenti la pausa qui sotto ammazza l'audio buono
-          sndEl.pause();
-          sndEl.currentTime = 0;
-        }).catch(function () { sndEl.muted = false; });
-      } else {
-        sndEl.pause(); sndEl.currentTime = 0; sndEl.muted = false;
-      }
-    }
+  var $ = function (id) { return document.getElementById(id); };
+  var pick = function (a) { return a[Math.floor(Math.random() * a.length)]; };
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
   }
 
-  function blastAudio() {
-    if (!sndEl) return;
-    blasting = true;
-    unlockAudio();
+  /* --- navigazione tra le schermate --- */
+  var current = 0;
+  function go(n) {
+    $('s' + current).classList.remove('on');
+    current = n;
+    $('s' + n).classList.add('on');
+    window.scrollTo(0, 0);
+    if (n === 5) finale();
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-go]');
+    if (t) go(+t.dataset.go);
+  });
 
-    // il gain a 4 supera il volume massimo normale di un tag <audio>:
-    // satura un po', ed e' esattamente quello che vogliamo
-    if (ctx && !srcNode) {
-      try {
-        srcNode = ctx.createMediaElementSource(sndEl);
-        boost = ctx.createGain();
-        boost.gain.value = 4;
-        srcNode.connect(boost);
-        boost.connect(ctx.destination);
-      } catch (e) { srcNode = null; }
+  /* --- audio: il primo gesto sblocca, se no al finale resta muto (iOS) --- */
+  var snd = $('snd');
+  var playing = false;   // lo sblocco non deve mettere in pausa il ka-ching gia' partito
+  function unlockAudio() {
+    if (snd.dataset.unlocked) return;
+    snd.dataset.unlocked = '1';
+    snd.muted = true;
+    var pr = snd.play();
+    if (pr && pr.then) {
+      pr.then(function () {
+        snd.muted = false;
+        if (playing) return;
+        snd.pause();
+        snd.currentTime = 0;
+      }).catch(function () { snd.muted = false; });
+    } else {
+      snd.pause(); snd.currentTime = 0; snd.muted = false;
     }
-    if (ctx && ctx.state === 'suspended') ctx.resume();
+  }
+  document.addEventListener('pointerdown', unlockAudio);
 
-    sndEl.muted = false;
-    sndEl.volume = 1;
-    sndEl.currentTime = 0;
-    sndEl.loop = true;
-    var p = sndEl.play();
+  /* --- contorno sketchy: ticker, timer, notifiche --- */
+  var NAMES = ['Giuseppe da Bari', 'Anna da Torino', 'Luca da Milano', 'Francesca da Napoli',
+               'Marco da Roma', 'Sara da Palermo', 'Davide da Bologna', 'Chiara da Firenze'];
+  var PRIZES = ['un iPhone 17 Pro Max', 'una PlayStation 6', '1000€', 'una Lamborghini', 'un buono spesa'];
+  var tick = '';
+  for (var i = 0; i < NAMES.length; i++) {
+    tick += '🔥 ' + NAMES[i] + ' ha appena vinto ' + PRIZES[i % PRIZES.length] + '!!! ';
+  }
+  $('ticker').textContent = tick;
+
+  var secs = 299;
+  setInterval(function () {
+    secs = secs > 0 ? secs - 1 : 299;   // a zero riparte: l'offerta scade sempre, mai
+    var m = Math.floor(secs / 60), s = secs % 60;
+    $('timer').textContent = '0' + m + ':' + (s < 10 ? '0' : '') + s;
+  }, 1000);
+
+  var toast = $('toast');
+  setInterval(function () {
+    if (current === 5) return;
+    toast.replaceChildren(
+      '🟢 ', el('b', null, pick(NAMES)), ' ha appena vinto ' + pick(PRIZES),
+      el('br'), el('i', null, (2 + Math.floor(Math.random() * 40)) + ' secondi fa')
+    );
+    toast.classList.add('on');
+    setTimeout(function () { toast.classList.remove('on'); }, 3500);
+  }, 7000);
+
+  /* --- 1. ruota truccata --- */
+  var SEG = [
+    ['📱 iPhone', '#ffe600'], ['😢 RITENTA', '#e10600'], ['🎮 PS6', '#2a73e8'], ['🥔 Patata', '#ffe600'],
+    ['💶 1000€', '#16a300'], ['😢 RITENTA', '#e10600'], ['🏎️ Lambo', '#ff00c8'], ['🧦 Calzino', '#ff8a00']
+  ];
+  var wheel = $('wheel');
+  var stops = [];
+  SEG.forEach(function (seg, i) {
+    stops.push(seg[1] + ' ' + (i * 45) + 'deg ' + (i * 45 + 45) + 'deg');
+    var lab = el('div', 'lab', seg[0]);
+    lab.style.color = seg[1] === '#ffe600' || seg[1] === '#ff8a00' ? '#000' : '#fff';
+    lab.style.transform = 'rotate(' + (i * 45 + 22.5 - 90) + 'deg)';
+    wheel.appendChild(lab);
+  });
+  wheel.style.background = 'conic-gradient(' + stops.join(',') + ')';
+
+  $('spin').addEventListener('click', function () {
+    var msg = $('wheelMsg');
+    this.disabled = true;
+    msg.textContent = '';
+    // girando in senso orario, sotto la freccia dopo RITENTA (45-90°) arriva iPhone (0-45°):
+    // si ferma a 48°, un soffio prima del confine, poi lo "scatto"
+    wheel.style.transition = 'transform 5s cubic-bezier(.12,.7,.18,1)';
+    wheel.style.transform = 'rotate(' + (360 * 6 - 48) + 'deg)';
+    setTimeout(function () { msg.textContent = '😢 RITENTA...'; }, 5000);
+    setTimeout(function () {
+      wheel.style.transition = 'transform .5s cubic-bezier(.3,1.6,.5,1)';
+      wheel.style.transform = 'rotate(' + (360 * 6 - 22.5) + 'deg)';
+      msg.textContent = '';
+    }, 6200);
+    setTimeout(function () {
+      msg.replaceChildren(el('span', 'rainbow', '🎉 HAI VINTO UN iPhone 17 Pro Max!!! 🎉'));
+      $('spin').hidden = true;
+      $('afterSpin').hidden = false;
+    }, 6900);
+  });
+
+  /* --- 2. captcha: iPhone veri e trappole (Android, banana...) --- */
+  var IPHONE = [1, 3, 6, 8];   // assets/captcha/cN.jpg che contengono davvero un iPhone
+  var grid = $('grid');
+  for (var c = 1; c <= 9; c++) {
+    var t = el('button', 'tile');
+    t.style.backgroundImage = 'url(assets/captcha/c' + c + '.jpg)';
+    t.dataset.iphone = IPHONE.indexOf(c) >= 0 ? '1' : '';
+    t.addEventListener('click', function () { this.classList.toggle('sel'); });
+    grid.appendChild(t);
+  }
+  $('verify').addEventListener('click', function () {
+    // passa comunque: cambia solo il commento
+    var right = [].every.call(grid.children, function (t) {
+      return t.classList.contains('sel') === !!t.dataset.iphone;
+    });
+    this.disabled = true;
+    $('capMsg').textContent = right
+      ? '✅ Verifica superata! Occhio infallibile.'
+      : '❌ Sbagliato... ma va bene lo stesso! ✅ Verifica superata.';
+    setTimeout(function () { go(3); }, 1800);
+  });
+
+  /* --- 3a. termini lunghissimi: "Accetto" solo dopo averli scorsi fino in fondo --- */
+  var legal = $('legal'), tosOk = $('tosOk');
+  legal.addEventListener('scroll', function () {
+    if (!tosOk.disabled) return;
+    if (legal.scrollTop + legal.clientHeight >= legal.scrollHeight - 12) {
+      tosOk.disabled = false;
+      tosOk.textContent = '✅ HO LETTO TUTTO E ACCETTO';
+    }
+  });
+  tosOk.addEventListener('click', function () {
+    $('tos').hidden = true;
+    $('dialog').hidden = false;
+    window.scrollTo(0, 0);
+    showClause();
+  });
+
+  /* --- 3b. clausole a catena --- */
+  var CLAUSES = [
+    'Accetti i Termini e Condizioni del concorso?',
+    'Accetti di non aver letto i Termini e Condizioni?',
+    'Accetti che il premio potrebbe differire leggermente dalla foto (colore, modello, esistenza)?',
+    'Accetti di ricevere 47 email al giorno, per sempre?',
+    'Accetti che "gratis" è un concetto relativo?',
+    'Accetti tutto quanto sopra e anche quello che c\'è scritto qui sotto?'
+  ];
+  var NO_SIZE = [16, 13, 10, 7, 5];   // all'ultima clausola "Rifiuta" non c'e' piu'
+  var YES_SIZE = [18, 20, 23, 26, 29, 32];
+  var ci = 0;
+  function restart(node, cls) {
+    node.classList.remove(cls); void node.offsetWidth; node.classList.add(cls);
+  }
+  function showClause() {
+    $('clauseN').textContent = 'Clausola ' + (ci + 1) + ' di ' + CLAUSES.length;
+    $('clause').textContent = CLAUSES[ci];
+    $('fine').hidden = ci !== CLAUSES.length - 1;
+    $('err').textContent = '';
+    var no = $('no');
+    no.hidden = ci >= NO_SIZE.length;
+    if (!no.hidden) no.style.fontSize = NO_SIZE[ci] + 'px';
+    $('yes').style.fontSize = YES_SIZE[ci] + 'px';
+    restart($('dialog'), 'pop');
+  }
+  $('no').addEventListener('click', function () {
+    $('err').textContent = pick(['❌ Risposta non valida. Riprova.', '❌ Errore: sei sicuro/a?',
+                                 '❌ Opzione momentaneamente non disponibile.']);
+    restart($('dialog'), 'shake');
+  });
+  $('yes').addEventListener('click', function () {
+    ci++;
+    if (ci < CLAUSES.length) showClause();
+    else go(4);
+  });
+
+  /* --- 4. il pulsante che scappa --- */
+  var run = $('run');
+  var dodges = 0;
+  var MOUSE_LIMIT = 8, TOUCH_LIMIT = 5;
+  var TAUNTS = ['Ops! 😜', 'Troppo lento!', 'Quasi!!!', 'Di qua! 👋', 'Nope.', 'Dai che ce la fai',
+                'Ancora un pochino...'];
+  var escaped = false;   // dopo la resa resta fermo dov'e'
+
+  function flee(px, py) {
+    var w = run.offsetWidth, h = run.offsetHeight;
+    var maxX = window.innerWidth - w - 10, maxY = window.innerHeight - h - 10;
+    var x, y, tries = 0;
+    do {
+      x = 10 + Math.random() * Math.max(0, maxX - 10);
+      y = 10 + Math.random() * Math.max(0, maxY - 10);
+      tries++;
+    } while (Math.hypot(x + w / 2 - px, y + h / 2 - py) < 220 && tries < 30);
+    if (!run.classList.contains('loose')) {
+      // prima fuga: lo stacco dal flusso partendo da dove si trova, cosi' la transizione parte da li'
+      var r = run.getBoundingClientRect();
+      var box = run.parentNode;
+      box.style.minHeight = box.offsetHeight + 'px';   // senza il pulsante il riquadro si accorcerebbe di colpo
+      run.style.left = r.left + 'px';
+      run.style.top = r.top + 'px';
+      run.classList.add('loose');
+      void run.offsetWidth;
+    }
+    run.style.left = x + 'px';
+    run.style.top = y + 'px';
+    $('runMsg').textContent = TAUNTS[Math.min(dodges, TAUNTS.length - 1)];
+    dodges++;
+  }
+  function giveUp(limit) {
+    if (dodges < limit || escaped) return;
+    escaped = true;
+    run.classList.add('tired');
+    run.textContent = '😮‍💨 VA BENE, PRENDIMI';
+    $('runMsg').textContent = 'Il pulsante si è arreso.';
+    // la scritta nuova e' piu' larga: lo riporto dentro lo schermo
+    var maxX = window.innerWidth - run.offsetWidth - 10, maxY = window.innerHeight - run.offsetHeight - 10;
+    run.style.left = Math.max(10, Math.min(parseFloat(run.style.left), maxX)) + 'px';
+    run.style.top = Math.max(10, Math.min(parseFloat(run.style.top), maxY)) + 'px';
+  }
+
+  document.addEventListener('pointermove', function (e) {
+    if (current !== 4 || e.pointerType !== 'mouse' || escaped) return;
+    var r = run.getBoundingClientRect();
+    var d = Math.hypot(r.left + r.width / 2 - e.clientX, r.top + r.height / 2 - e.clientY);
+    if (d < Math.max(r.width, r.height) / 2 + 50) {
+      flee(e.clientX, e.clientY);
+      giveUp(MOUSE_LIMIT);
+    }
+  });
+  run.addEventListener('pointerdown', function (e) {
+    var limit = e.pointerType === 'mouse' ? MOUSE_LIMIT : TOUCH_LIMIT;
+    if (!escaped && dodges < limit) {
+      e.preventDefault();
+      flee(e.clientX, e.clientY);
+      giveUp(limit);
+      return;
+    }
+    go(5);
+  });
+
+  /* --- 5. finale --- */
+  function finale() {
+    toast.classList.remove('on');
+    run.classList.remove('loose');
+    run.style.left = run.style.top = '';
+    var countEl = $('count');
+    var seq = ['3...', '3... 2...', '3... 2... 1...'];
+    seq.forEach(function (txt, i) {
+      setTimeout(function () { countEl.textContent = txt; }, 600 + i * 1000);
+    });
+    setTimeout(function () {
+      countEl.style.display = 'none';
+      $('order').textContent = '#IT-' + (1000 + Math.floor(Math.random() * 9000)) + '-' +
+        String.fromCharCode(65 + Math.floor(Math.random() * 26), 65 + Math.floor(Math.random() * 26));
+      $('paid').classList.add('on');
+      kaching();
+      rain();
+    }, 600 + seq.length * 1000);
+  }
+
+  function kaching() {
+    playing = true;
+    snd.muted = false;
+    snd.currentTime = 0;
+    var p = snd.play();
     if (p && p.catch) p.catch(function () {});
   }
 
-  function stopAudio() {
-    blasting = false;
-    if (!sndEl) return;
-    try {
-      sndEl.pause();
-      sndEl.currentTime = 0;
-    } catch (e) {}
-  }
-
-  /* --- barra di avanzamento: rallenta verso la fine --- */
-  function paint() {
-    nEl.textContent = clicks;
-    var r = clicks / TARGET;
-    fillEl.style.width = (Math.pow(r, 1.7) * 100).toFixed(1) + '%';
-
-    if (clicks === 0)          statusEl.textContent = 'In attesa del primo click…';
-    else if (clicks < 10)      statusEl.textContent = 'Analisi del comportamento in corso…';
-    else if (clicks < 20)      statusEl.textContent = 'Confronto con i modelli noti…';
-    else if (clicks < 25)      statusEl.textContent = 'Quasi fatto, continua…';
-    else if (clicks < TARGET)  statusEl.textContent = 'Ultimi controlli… non fermarti adesso!';
-  }
-
-  function goFullscreen() {
-    var el = document.documentElement;
-    var fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
-    if (fn) { try { fn.call(el).catch(function () {}); } catch (e) {} }
-  }
-
-  function fire() {
-    fired = true;
-    statusEl.textContent = 'Verifica completata.';
-    goFullscreen();
-    blastEl.classList.add('on');
-    blastAudio();
-    // nessun pulsante visibile: dopo 4s un click o un tasto qualsiasi ferma tutto
-    setTimeout(function () { canStop = true; }, 4000);
-  }
-
-  function stopAll() {
-    stopAudio();
-    blastEl.classList.remove('on');
-    if (document.fullscreenElement && document.exitFullscreen) {
-      document.exitFullscreen().catch(function () {});
+  function rain() {
+    var BITS = ['💸', '💶', '💸', '🪙', '🎉'];
+    var COLORS = ['#e10600', '#ffe600', '#16a300', '#2a73e8', '#ff00c8'];
+    for (var i = 0; i < 90; i++) {
+      var bit = el('div', 'fall');
+      if (i % 2) {
+        bit.textContent = pick(BITS);
+        bit.style.fontSize = (22 + Math.random() * 20) + 'px';
+      } else {
+        bit.style.width = '10px';
+        bit.style.height = '14px';
+        bit.style.background = pick(COLORS);
+      }
+      bit.style.left = (Math.random() * 100) + 'vw';
+      bit.style.animationDuration = (2.5 + Math.random() * 3) + 's';
+      bit.style.animationDelay = (Math.random() * 1.5) + 's';
+      bit.addEventListener('animationend', function () { this.remove(); });
+      document.body.appendChild(bit);
     }
-    statusEl.textContent = '';
-    document.body.style.cursor = 'default';
   }
-
-  function onPress(e) {
-    if (fired) {
-      if (canStop) { e.preventDefault(); stopAll(); }
-      return;
-    }
-    unlockAudio();           // il primo click sblocca l'audio: i browser lo richiedono
-    clicks++;
-    paint();
-    if (clicks >= TARGET) fire();
-  }
-
-  document.addEventListener('pointerdown', onPress);
-  document.addEventListener('keydown', function (e) {
-    if (fired && canStop) { stopAll(); return; }
-    if (!fired && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); onPress(e); }
-  });
-  document.addEventListener('contextmenu', function (e) { if (fired) e.preventDefault(); });
-
-  paint();
 })();
 </script>
 </body>
