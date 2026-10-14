@@ -1,16 +1,15 @@
 # Sito-Bellissimo
 
-Scherzo tra amici. Finto sito "HAI VINTO!!!" in stile truffa anni 2000:
-ruota della fortuna truccata, captcha "trova gli iPhone" (passa comunque),
-termini e condizioni legalese lunghissimi da scorrere fino in fondo, poi
-clausole a catena (con "Rifiuta" che si rimpicciolisce fino a sparire) e
-un pulsante che scappa. Alla fine: "Grazie per il suo acquisto! I 1799,99€ verranno
-scalati in 3... 2... 1..." e pagamento completato con ka-ching.
+Scherzo tra amici. Finto gioco "Safari Hunter": nella savana passano zebre
+al galoppo (alcune cambiano idea e tornano indietro) e bisogna abbatterne 6.
+Alla sesta parte il finale: `assets/finale.jpg` a tutto schermo con vine boom.
 
-Nessun dato viene chiesto o raccolto: e' tutta scena.
+Pagina singola, zero dipendenze: apri `index.html`. Funziona con mouse e
+touch (pensato soprattutto per il telefono).
 
-Pagina singola, zero dipendenze: apri `index.html`.
+Le zebre sono disegnate in SVG dentro la pagina e non con l'emoji 🦓, perché
+l'emoji guarda in versi diversi a seconda del telefono. Lo sparo è
+sintetizzato con WebAudio.
 
-Audio: "Cash Register (Kaching) - Sound Effect" da Pixabay. Foto del
-captcha (`assets/captcha/`, iPhone = c1, c3, c6, c8) da Pixabay, ritagliate
-a 240px. Tutto royalty-free, nessuna attribuzione richiesta.
+Audio: `assets/boom.mp3` ("Vine boom") da Pixabay, royalty-free, nessuna
+attribuzione richiesta.
