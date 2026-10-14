@@ -27,35 +27,60 @@
   #field {
     position: fixed; inset: 0; overflow: hidden;
     cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cg fill='none' stroke='%23e00' stroke-width='2.5'%3E%3Ccircle cx='24' cy='24' r='15'/%3E%3Cpath d='M24 2v14M24 32v14M2 24h14M32 24h14'/%3E%3C/g%3E%3Ccircle cx='24' cy='24' r='2' fill='%23e00'/%3E%3C/svg%3E") 24 24, crosshair;
+    /* orizzonte al 52% dall'alto: tutto lo scenario e le zebre si appoggiano li' */
+    background: linear-gradient(#f2643c 0%, #ff8f4a 18%, #ffb25e 34%, #ffd58a 46%, #ffe8b4 52%,
+                                #dcaa58 52%, #cf9846 64%, #b8802f 84%, #a06d26 100%);
+  }
+  #field > *:not(.zebra):not(.fx) { position: absolute; pointer-events: none; }
+  .sun {
+    left: 72%; top: 31%;
+    width: min(24vw, 150px); aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(#fffbe0 0 45%, #ffe27a 62%, rgba(255,214,110,0) 71%);
+    box-shadow: 0 0 60px 30px rgba(255,220,120,.45), 0 0 160px 90px rgba(255,170,80,.3);
+  }
+  .cloud {
+    width: 120px; height: 20px; border-radius: 20px;
+    background: rgba(255,236,214,.65);
+    animation: drift linear infinite;
+  }
+  .cloud::before {
+    content: ""; position: absolute; left: 26px; top: -12px;
+    width: 52px; height: 26px; border-radius: 50%; background: inherit;
+  }
+  @keyframes drift { from { transform: translateX(-160px); } to { transform: translateX(calc(100vw + 40px)); } }
+  .birds { animation: drift linear infinite; }
+  .birds svg { overflow: visible; }
+  .birds path { animation: flap .45s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+  .birds path:nth-child(2) { animation-delay: -.2s; }
+  .birds path:nth-child(3) { animation-delay: -.35s; }
+  @keyframes flap { to { transform: scaleY(.3); } }
+  .mountains { left: 0; bottom: 48%; width: 100%; height: 15%; }
+  .haze {
+    left: 0; right: 0; bottom: 45%; height: 8%;
+    background: linear-gradient(transparent, rgba(255,226,160,.55) 50%, transparent);
+  }
+  .ground {
+    left: 0; right: 0; bottom: 0; height: 48%;
     background:
-      radial-gradient(circle at 78% 22%, #fff6b0 0 4%, #ffd34d 4.5% 7%, transparent 7.5%),
-      linear-gradient(#ff9d3d 0%, #ffc56b 32%, #ffe3a0 52%, transparent 52%),
-      radial-gradient(ellipse 60% 14% at 20% 54%, #c98a3a 98%, transparent 100%),
-      radial-gradient(ellipse 70% 12% at 80% 55%, #b97a30 98%, transparent 100%),
-      linear-gradient(transparent 52%, #e0a548 52%, #d8963b 70%, #c4822c 100%);
+      radial-gradient(ellipse 30% 6% at 22% 30%, rgba(140,90,30,.25), transparent),
+      radial-gradient(ellipse 26% 5% at 76% 48%, rgba(140,90,30,.22), transparent),
+      radial-gradient(ellipse 40% 7% at 40% 72%, rgba(130,80,25,.25), transparent),
+      radial-gradient(ellipse 22% 4% at 88% 18%, rgba(255,230,170,.3), transparent),
+      repeating-linear-gradient(0deg, transparent 0 7px, rgba(120,80,20,.06) 7px 9px);
   }
-  .tree {
-    position: absolute; pointer-events: none;
-    width: 150px; height: 110px;
-  }
-  .tree::before { /* chioma piatta dell'acacia */
-    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 36px;
-    background: #3d5a1e; border-radius: 50%;
-    box-shadow: 18px -10px 0 -4px #4a6b24, -14px 6px 0 -6px #34501a;
-  }
-  .tree::after { /* tronco */
-    content: ""; position: absolute; left: 50%; top: 24px; bottom: 0; width: 10px;
-    margin-left: -5px; background: #4a2d12; border-radius: 4px;
-  }
+  /* alberi, cespugli e ciuffi: "bottom" e' il punto in cui toccano terra */
+  .acacia, .bush, .tuft { transform: translateX(-50%); }
+  .acacia { aspect-ratio: 200 / 150; overflow: visible; }
+  .bush { aspect-ratio: 2; }
+  .tuft { aspect-ratio: 5 / 3; }
   .grass {
-    position: absolute; left: 0; right: 0; bottom: 0; height: 14%;
-    pointer-events: none; z-index: 900;
-    background:
-      repeating-linear-gradient(100deg, transparent 0 9px, rgba(90,60,10,.25) 9px 11px),
-      linear-gradient(transparent, rgba(120,80,20,.5));
-    -webkit-mask: linear-gradient(transparent, #000 40%);
-            mask: linear-gradient(transparent, #000 40%);
+    left: 0; right: 0; bottom: 0; height: 13%;
+    z-index: 900;
+    background: linear-gradient(transparent, rgba(110,70,15,.45));
   }
+  .grass svg { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; }
 
   /* --- zebre --- */
   .zebra {
@@ -74,6 +99,19 @@
   @keyframes gallop {
     from { transform: translateY(0) rotate(-4deg); }
     to   { transform: translateY(-14%) rotate(4deg); }
+  }
+  .zebra.star .body { animation-name: hop; animation-duration: .28s; }
+  .zebra.star img {
+    display: block; height: 100%; width: auto;
+    /* la foto finisce tagliata dritta in basso: la sfumo nell'erba */
+    -webkit-mask: linear-gradient(#000 82%, transparent);
+            mask: linear-gradient(#000 82%, transparent);
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,.35));
+    -webkit-user-drag: none;
+  }
+  @keyframes hop {
+    from { transform: translateY(0) rotate(-5deg); }
+    to   { transform: translateY(-6%) rotate(5deg); }
   }
   .zebra.dead { pointer-events: none; }
   .zebra.dead .body { animation: fall .9s ease-in forwards; }
@@ -166,34 +204,52 @@
   .cta:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--ink); }
   @keyframes pump { 50% { transform: scale(1.06); } }
 
-  /* --- finale --- */
-  #finale {
+  /* --- fine partita --- */
+  #end {
     position: fixed; inset: 0; z-index: 2000;
     display: none; align-items: center; justify-content: center;
-    background: #000;
+    padding: 16px; background: rgba(40,20,0,.55);
   }
-  #finale.on { display: flex; }
-  #finale img {
-    width: 100%; height: 100%; object-fit: contain;
-    animation: reveal .45s cubic-bezier(.2, 1.6, .4, 1) both, wobble .5s .45s ease-in-out 3;
-  }
-  @keyframes reveal {
-    from { transform: scale(.05) rotate(-540deg); opacity: 0; }
-    to   { transform: scale(1) rotate(0); opacity: 1; }
-  }
-  @keyframes wobble {
-    25% { transform: scale(1.04) rotate(-2deg); }
-    75% { transform: scale(1.04) rotate(2deg); }
-  }
+  #end.on { display: flex; }
+  #end .card { animation: drop .5s cubic-bezier(.2, 1.6, .4, 1) both; }
+  @keyframes drop { from { transform: translateY(-120vh); } }
 </style>
 </head>
 <body>
 
 <div id="field">
-  <div class="tree" style="left:6%; top:38%; transform:scale(.8)"></div>
-  <div class="tree" style="right:12%; top:41%; transform:scale(.55)"></div>
-  <div class="tree" style="left:58%; top:44%; transform:scale(.35)"></div>
-  <div class="grass"></div>
+  <div class="sun"></div>
+  <div class="cloud" style="top:12%; animation-duration:95s; animation-delay:-30s"></div>
+  <div class="cloud" style="top:22%; animation-duration:130s; animation-delay:-95s; width:80px"></div>
+  <div class="cloud" style="top:7%; animation-duration:110s; animation-delay:-70s"></div>
+  <div class="birds" style="top:17%; animation-duration:38s; animation-delay:-12s">
+    <svg width="60" height="24" viewBox="0 0 60 24" fill="none" stroke="#3a1c10" stroke-width="2" stroke-linecap="round">
+      <path d="M2 8 Q7 2 12 8 Q17 2 22 8"/><path d="M26 16 Q30 11 34 16 Q38 11 42 16"/><path d="M44 4 Q48 0 51 4 Q54 0 58 4"/>
+    </svg>
+  </div>
+  <svg class="mountains" viewBox="0 0 1000 100" preserveAspectRatio="none">
+    <path d="M0 100 L0 66 L90 52 L170 62 L260 38 L330 50 L420 28 Q470 10 515 12 Q560 12 600 32 L690 48 L780 42 L870 60 L1000 48 L1000 100 Z" fill="#a7718a" opacity=".55"/>
+    <path d="M452 22 Q488 8 515 10 Q548 10 578 26 L560 23 L546 30 L527 21 L506 29 L486 22 L468 27 Z" fill="#fff4ec" opacity=".75"/>
+    <path d="M0 100 L0 78 Q120 58 250 76 Q340 88 430 72 Q560 54 700 78 Q830 94 1000 70 L1000 100 Z" fill="#c98f5a" opacity=".8"/>
+  </svg>
+  <div class="haze"></div>
+  <div class="ground"></div>
+  <svg class="acacia" style="left:16%; bottom:47.4%; width:min(30vw, 210px)"><use href="#acacia"/></svg>
+  <svg class="acacia" style="left:66%; bottom:47.8%; width:min(15vw, 110px)"><use href="#acacia"/></svg>
+  <svg class="acacia" style="left:84%; bottom:47.9%; width:min(9vw, 66px)"><use href="#acacia"/></svg>
+  <svg class="acacia" style="left:92%; bottom:38%; width:min(42vw, 300px)"><use href="#acacia"/></svg>
+  <svg class="bush" style="left:40%; bottom:46.5%; width:min(10vw, 60px)"><use href="#bush"/></svg>
+  <svg class="bush" style="left:6%; bottom:33%; width:min(18vw, 110px)"><use href="#bush"/></svg>
+  <svg class="bush" style="left:58%; bottom:24%; width:min(22vw, 140px)"><use href="#bush"/></svg>
+  <svg class="tuft" style="left:28%; bottom:42%; width:min(7vw, 40px)"><use href="#tuft"/></svg>
+  <svg class="tuft" style="left:74%; bottom:35%; width:min(9vw, 50px)"><use href="#tuft"/></svg>
+  <svg class="tuft" style="left:20%; bottom:20%; width:min(12vw, 70px)"><use href="#tuft"/></svg>
+  <svg class="tuft" style="left:86%; bottom:16%; width:min(13vw, 76px)"><use href="#tuft"/></svg>
+  <div class="grass">
+    <svg viewBox="0 0 400 40" preserveAspectRatio="none">
+      <path d="M0 40 L0 22 L6 14 L12 28 L18 18 L24 30 L30 10 L36 28 L42 20 L48 32 L54 12 L60 28 L66 16 L72 30 L78 8 L84 28 L90 20 L96 32 L102 14 L108 28 L114 18 L120 30 L126 10 L132 28 L138 20 L144 32 L150 12 L156 28 L162 16 L168 30 L174 8 L180 28 L186 20 L192 32 L198 14 L204 28 L210 18 L216 30 L222 10 L228 28 L234 20 L240 32 L246 12 L252 28 L258 16 L264 30 L270 8 L276 28 L282 20 L288 32 L294 14 L300 28 L306 18 L312 30 L318 10 L324 28 L330 20 L336 32 L342 12 L348 28 L354 16 L360 30 L366 8 L372 28 L378 20 L384 32 L390 14 L396 28 L400 24 L400 40 Z" fill="#8a5d1e" opacity=".55"/>
+    </svg>
+  </div>
 </div>
 <div id="flash"></div>
 
@@ -206,6 +262,23 @@
       <rect x="30" y="54" width="7" height="32"/><rect x="41" y="56" width="7" height="30"/>
       <rect x="66" y="56" width="7" height="30"/><rect x="77" y="54" width="7" height="32"/>
     </clipPath>
+    <symbol id="acacia" viewBox="0 0 200 150">
+      <ellipse cx="100" cy="150" rx="70" ry="6" fill="#8a5a1e" opacity=".35"/>
+      <path d="M95 150 C97 122 95 102 88 84 L68 52 L75 48 L92 76 L99 58 L104 38 L111 40 L106 64 L104 82 L124 50 L131 54 L109 92 C105 110 105 130 108 150 Z" fill="#4a2c14"/>
+      <ellipse cx="100" cy="47" rx="86" ry="7" fill="#2c4416"/>
+      <g fill="#3d5c20">
+        <ellipse cx="100" cy="40" rx="92" ry="13"/><ellipse cx="58" cy="34" rx="46" ry="12"/>
+        <ellipse cx="142" cy="33" rx="50" ry="13"/><ellipse cx="102" cy="27" rx="56" ry="12"/>
+      </g>
+      <g fill="#58792e"><ellipse cx="78" cy="24" rx="34" ry="7"/><ellipse cx="136" cy="25" rx="30" ry="6"/></g>
+    </symbol>
+    <symbol id="bush" viewBox="0 0 60 30">
+      <g fill="#6b6a2a"><ellipse cx="18" cy="22" rx="16" ry="9"/><ellipse cx="40" cy="21" rx="18" ry="10"/><ellipse cx="29" cy="15" rx="14" ry="10"/></g>
+      <g fill="#86833a"><ellipse cx="25" cy="12" rx="8" ry="4"/><ellipse cx="42" cy="15" rx="7" ry="3"/></g>
+    </symbol>
+    <symbol id="tuft" viewBox="0 0 40 24">
+      <path d="M20 24 Q18 10 12 2 M20 24 Q21 8 24 0 M20 24 Q25 12 34 5 M20 24 Q14 15 4 10 M20 24 Q28 18 38 15" fill="none" stroke="#8a6b24" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
     <symbol id="zebra" viewBox="0 0 124 92">
       <path d="M23 40 Q12 48 13 64" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"/>
       <path d="M11 60 l4 9 l3 -9 z" fill="#111"/>
@@ -248,8 +321,14 @@
   </div>
 </div>
 
-<div id="finale"><img src="assets/finale.jpg" alt=""></div>
-<audio id="snd" src="assets/boom.mp3" preload="auto"></audio>
+<div id="end">
+  <div class="card">
+    <h1>Caccia completata!</h1>
+    <div class="big">🏆</div>
+    <p id="score"></p>
+    <button class="cta" id="again">Rigioca</button>
+  </div>
+</div>
 
 <script>
 (() => {
@@ -259,10 +338,12 @@
   const tally = document.getElementById('tally');
   const shotsEl = document.getElementById('shots');
   const msg = document.getElementById('msg');
-  const snd = document.getElementById('snd');
 
   let hits = 0, shots = 0, running = false, over = false;
-  let zebras = [], nextSpawn = 0, last = 0;
+  let zebras = [], nextSpawn = 0, last = 0, starSeen = false;
+  const STAR_SRC = 'assets/ultima-zebra.webp';
+  const STAR_RATIO = 493 / 900; // larghezza / altezza della foto scontornata
+  new Image().src = STAR_SRC; // pronta prima che serva
   let ctx = null;
 
   function drawTally() {
@@ -271,16 +352,12 @@
   }
   drawTally();
 
-  /* --- audio: il click su "Caccia!" sblocca sia l'mp3 sia WebAudio (iOS) --- */
+  /* --- audio: WebAudio va creato dentro il click su "Caccia!" (iOS) --- */
   function unlockAudio() {
     try {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
       ctx.resume();
     } catch (e) { ctx = null; }
-    snd.muted = true;
-    const p = snd.play();
-    const reset = () => { snd.pause(); snd.currentTime = 0; snd.muted = false; };
-    if (p && p.then) p.then(reset, reset); else reset();
   }
 
   // sparo sintetizzato: botta di rumore con passa-basso che si chiude
@@ -304,23 +381,42 @@
     src.start(t);
   }
 
-  /* --- zebre --- */
+  /* --- zebre: una alla volta, la sesta e' la foto --- */
+  // dalla prima alla quinta sempre piu' veloci; la foto va come la seconda
+  function speedOf(n) {
+    return (innerWidth < 600 ? 90 : 130) * (1 + n * 0.4);
+  }
+
   function spawn() {
     const W = innerWidth, H = innerHeight;
-    // depth 0 = lontana (in alto, piccola, lenta), 1 = vicina
-    const depth = Math.random();
-    const size = 34 + depth * 46 + Math.min(W, H) * 0.035;
+    const star = hits === GOAL - 1;
     const right = Math.random() < 0.5;
-    const speed = (90 + depth * 140 + hits * 25) * (W < 600 ? 0.7 : 1) * (0.85 + Math.random() * 0.3);
     const el = document.createElement('div');
-    el.className = 'zebra' + (right ? '' : ' left');
-    el.innerHTML = `<span class="body" style="width:${size * 1.35}px"><svg viewBox="0 0 124 92"><use href="#zebra"/></svg></span>`;
+    let w, y, speed, depth;
+    if (star) {
+      const h = Math.min(H * 0.34, 320);
+      w = h * STAR_RATIO;
+      depth = 1;
+      y = H * 0.84 - h;
+      speed = speedOf(1);
+      el.className = 'zebra star';
+      el.innerHTML = `<span class="body" style="height:${h}px"><img src="${STAR_SRC}" alt="" draggable="false"></span>`;
+    } else {
+      // depth 0 = lontana (in alto, piccola, lenta), 1 = vicina
+      depth = Math.random();
+      const size = 34 + depth * 46 + Math.min(W, H) * 0.035;
+      w = size * 1.35;
+      y = H * (0.50 + depth * 0.31) - size * 0.9;
+      speed = speedOf(hits);
+      el.className = 'zebra' + (right ? '' : ' left');
+      el.innerHTML = `<span class="body" style="width:${w}px"><svg viewBox="0 0 124 92"><use href="#zebra"/></svg></span>`;
+    }
     el.style.zIndex = 100 + Math.round(depth * 700);
     field.appendChild(el);
     const z = {
-      el, size, right,
-      x: right ? -size * 1.4 - 30 : W + 10,
-      y: H * (0.47 + depth * 0.33) - size * 0.9,
+      el, w, right, star,
+      x: right ? -w - 40 : W + 10,
+      y,
       v: right ? speed : -speed,
       // ogni tanto cambiano idea e tornano indietro
       turnAt: Math.random() < 0.35 ? W * (0.25 + Math.random() * 0.5) : null,
@@ -329,6 +425,10 @@
     el.addEventListener('pointerdown', e => { e.stopPropagation(); shoot(e, z); });
     zebras.push(z);
     place(z);
+    if (star && !starSeen) {
+      starSeen = true;
+      say('ULTIMA ZEBRA!');
+    }
   }
 
   function place(z) {
@@ -340,22 +440,22 @@
     const dt = Math.min(0.05, (now - last) / 1000 || 0);
     last = now;
     const W = innerWidth;
-    const alive = zebras.filter(z => !z.dead).length;
-    if (now >= nextSpawn && alive < 3 && !over) {
-      spawn();
-      nextSpawn = now + 650 + Math.random() * 900;
+    // la prossima arriva solo quando la precedente e' uscita o e' caduta
+    if (!zebras.length && !over) {
+      if (!nextSpawn) nextSpawn = now + 350 + Math.random() * 600;
+      else if (now >= nextSpawn) { spawn(); nextSpawn = 0; }
     }
     zebras = zebras.filter(z => {
       if (z.dead) return true;
       z.x += z.v * dt;
       if (z.turnAt !== null && (z.v > 0 ? z.x > z.turnAt : z.x < z.turnAt)) {
-        z.v = -z.v * 1.3;
+        z.v = -z.v;
         z.turnAt = null;
         z.right = z.v > 0;
-        z.el.classList.toggle('left', !z.right);
+        if (!z.star) z.el.classList.toggle('left', !z.right);
       }
       place(z);
-      if (z.x < -z.size * 1.4 - 60 || z.x > W + 60) { z.el.remove(); return false; }
+      if (z.x < -z.w - 60 || z.x > W + 60) { z.el.remove(); return false; }
       return true;
     });
     requestAnimationFrame(tick);
@@ -409,18 +509,19 @@
 
   field.addEventListener('pointerdown', e => shoot(e, null));
 
-  /* --- finale --- */
+  /* --- fine partita --- */
   function finish() {
     over = true;
-    say('CACCIA COMPLETATA!');
+    say('PRESA!!!');
     setTimeout(() => {
       running = false;
-      document.getElementById('finale').classList.add('on');
-      snd.currentTime = 0;
-      snd.volume = 1;
-      snd.play().catch(() => {});
-    }, 1100);
+      document.getElementById('score').textContent =
+        `${GOAL} zebre su ${GOAL} con ${shots} ${shots === 1 ? 'colpo' : 'colpi'}.`;
+      document.getElementById('end').classList.add('on');
+    }, 1300);
   }
+
+  document.getElementById('again').addEventListener('click', () => location.reload());
 
   document.getElementById('go').addEventListener('click', () => {
     unlockAudio();
