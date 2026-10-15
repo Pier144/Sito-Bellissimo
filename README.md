@@ -21,3 +21,12 @@ Ripristinati così com'erano, ognuno nella sua cartella con i suoi file:
   iPhone, termini con l'addebito di 1799,99€ e ka-ching finale).
 - `verifica/`: finta verifica anti-bot, 30 clic poi gif "Puzzona" a schermo
   intero col vine boom.
+
+## Aula
+
+`aula/`: finto video verticale. Si preme play (serve anche a sbloccare
+l'audio), una lezione in cerchio in aula con 20 compagni disegnati in SVG e
+lei al centro del fondo come foto scontornata (`aula/assets/lei.webp`). Dopo
+8 secondi tutti si girano verso di lei, la camera zooma con l'occhio di bue
+e parte `aula/assets/audio.mp3` (audio del TikTok, tagliato prima della
+sigla finale, normalizzato e spinto oltre il 100% con WebAudio).
