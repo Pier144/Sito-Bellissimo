@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>五条悟 · Satoru Gojo</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#05060f">
+<style>
+  * { box-sizing: border-box; }
+  :root {
+    --bg: #05060f;
+    --panel: #0d1024;
+    --line: rgba(140, 200, 255, .18);
+    --text: #eef4ff;
+    --muted: #93a1c4;
+    --blu: #4fb8ff;
+    --blu-chiaro: #bdeaff;
+    --rosso: #ff4d6d;
+    --viola: #a35bff;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+  }
+  a { color: var(--blu-chiaro); }
+  h2 {
+    margin: 0 0 6px;
+    font-size: clamp(26px, 6vw, 38px);
+    letter-spacing: .02em;
+  }
+  h2 small { display: block; font-size: 13px; color: var(--blu); letter-spacing: .3em; font-weight: 600; }
+  section { padding: 64px 16px; max-width: 1100px; margin: 0 auto; }
+  .sotto { color: var(--muted); margin: 0 0 28px; }
+
+  /* stelline sullo sfondo: due strati che scorrono piano */
+  #stelle { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+
+  /* ---------------- HERO ---------------- */
+  #hero {
+    min-height: 100svh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 24px 16px 40px;
+    max-width: none;
+    background: radial-gradient(ellipse at 50% 40%, rgba(79, 184, 255, .16), transparent 60%);
+  }
+  #volto { width: min(420px, 88vw); height: auto; overflow: visible; cursor: pointer; }
+  #benda { transition: transform .9s cubic-bezier(.6, -0.3, .3, 1.3); transform-origin: 200px 150px; }
+  #volto.svelato #benda { transform: translateY(-118px) rotate(-4deg); }
+  #occhi { opacity: 0; transition: opacity .5s .35s; }
+  #volto.svelato #occhi { opacity: 1; }
+  #volto.svelato .iride { animation: pulsa 2.4s ease-in-out infinite; }
+  @keyframes pulsa { 50% { filter: brightness(1.35); } }
+
+  .nome-jp { font-size: clamp(40px, 12vw, 84px); font-weight: 800; letter-spacing: .12em; margin: 8px 0 0; line-height: 1.1; }
+  .nome { margin: 4px 0 0; font-size: clamp(18px, 4.5vw, 26px); letter-spacing: .5em; color: var(--blu-chiaro); text-transform: uppercase; padding-left: .5em; }
+  .motto { margin: 18px auto 0; max-width: 520px; color: var(--muted); font-style: italic; }
+  .bottoni { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 26px; }
+  .btn {
+    font: inherit; font-weight: 700; letter-spacing: .04em;
+    color: var(--text); background: rgba(79, 184, 255, .12);
+    border: 1px solid rgba(79, 184, 255, .55);
+    padding: 12px 20px; border-radius: 999px; cursor: pointer; text-decoration: none;
+    transition: background .2s, transform .2s, box-shadow .2s;
+  }
+  .btn:hover { background: rgba(79, 184, 255, .25); box-shadow: 0 0 24px rgba(79, 184, 255, .45); transform: translateY(-2px); }
+  .btn.viola { background: linear-gradient(90deg, rgba(255, 77, 109, .25), rgba(163, 91, 255, .35), rgba(79, 184, 255, .25)); border-color: var(--viola); }
+  .btn.viola:hover { box-shadow: 0 0 28px rgba(163, 91, 255, .6); }
+  .hint { margin-top: 14px; font-size: 13px; color: var(--muted); }
+
+  /* ---------------- SCHEDA ---------------- */
+  .scheda {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px;
+  }
+  .voce {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px;
+  }
+  .voce b { display: block; font-size: 12px; letter-spacing: .15em; text-transform: uppercase; color: var(--blu); margin-bottom: 4px; }
+
+  /* ---------------- TECNICHE ---------------- */
+  .tecniche { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+  .tecnica {
+    position: relative; overflow: hidden;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    padding: 22px 20px 20px;
+  }
+  .tecnica h3 { margin: 14px 0 4px; font-size: 20px; }
+  .tecnica .jp { font-size: 13px; color: var(--muted); letter-spacing: .2em; }
+  .tecnica p { margin: 8px 0 0; color: var(--muted); font-size: 15px; }
+  .sfera {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fff, var(--c) 35%, transparent 72%);
+    box-shadow: 0 0 34px var(--c);
+    animation: fluttua 4s ease-in-out infinite;
+  }
+  .tecnica:nth-child(2) .sfera { animation-delay: -1s; }
+  .tecnica:nth-child(3) .sfera { animation-delay: -2s; }
+  .tecnica:nth-child(4) .sfera { animation-delay: -3s; }
+  @keyframes fluttua { 50% { transform: translateY(-6px) scale(1.06); } }
+  .sfera.infinito { background: radial-gradient(circle, transparent 30%, rgba(189, 234, 255, .6) 32%, transparent 36%, rgba(189, 234, 255, .35) 52%, transparent 56%, rgba(189, 234, 255, .2) 70%, transparent 74%); box-shadow: none; }
+
+  /* ---------------- GALLERIA ---------------- */
+  .filtri { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .filtro {
+    font: inherit; font-size: 14px; font-weight: 600; color: var(--muted);
+    background: transparent; border: 1px solid var(--line); border-radius: 999px;
+    padding: 8px 16px; cursor: pointer;
+  }
+  .filtro[aria-pressed="true"] { color: var(--bg); background: var(--blu-chiaro); border-color: var(--blu-chiaro); }
+  #griglia { columns: 3 260px; column-gap: 14px; }
+  .foto {
+    break-inside: avoid; margin: 0 0 14px; position: relative;
+    border-radius: 16px; overflow: hidden; cursor: zoom-in;
+    background: var(--panel); border: 1px solid var(--line);
+  }
+  .foto img { display: block; width: 100%; height: auto; transition: transform .4s; }
+  .foto:hover img { transform: scale(1.04); }
+  .foto figcaption {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 28px 12px 10px; font-size: 13px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, .75));
+  }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; background: rgba(79, 184, 255, .3); margin-right: 6px; }
+  .tag.cosplay { background: rgba(163, 91, 255, .4); }
+
+  /* galleria ancora vuota: riquadri "in arrivo" */
+  .vuota {
+    break-inside: avoid; margin: 0 0 14px; border-radius: 16px; border: 1px dashed var(--line);
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    color: var(--muted); font-size: 14px; padding: 16px;
+    background: radial-gradient(circle at 50% 40%, rgba(79, 184, 255, .12), transparent 70%), var(--panel);
+  }
+
+  /* ---------------- LIGHTBOX ---------------- */
+  #lb {
+    position: fixed; inset: 0; z-index: 20;
+    background: rgba(2, 3, 10, .94);
+    display: none; align-items: center; justify-content: center; flex-direction: column;
+    padding: 16px;
+  }
+  #lb.aperto { display: flex; }
+  #lb img { max-width: 100%; max-height: calc(100svh - 120px); border-radius: 12px; box-shadow: 0 0 60px rgba(79, 184, 255, .25); }
+  #lb .didascalia { margin-top: 12px; font-size: 14px; color: var(--muted); text-align: center; }
+  #lb button {
+    position: absolute; font: inherit; font-size: 26px; line-height: 1; color: var(--text);
+    background: rgba(255, 255, 255, .08); border: 0; border-radius: 50%;
+    width: 48px; height: 48px; cursor: pointer;
+  }
+  #lb .chiudi { top: 14px; right: 14px; }
+  #lb .prec { left: 10px; top: 50%; transform: translateY(-50%); }
+  #lb .succ { right: 10px; top: 50%; transform: translateY(-50%); }
+
+  /* ---------------- ESPANSIONE DEL DOMINIO ---------------- */
+  #dominio {
+    position: fixed; inset: 0; z-index: 30;
+    display: none; align-items: center; justify-content: center; flex-direction: column;
+    background: #000; cursor: pointer; overflow: hidden; text-align: center;
+  }
+  #dominio.attivo { display: flex; }
+  #dominio canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #dominio .titolo { position: relative; opacity: 0; animation: appari 1.2s .6s forwards; padding: 0 16px; }
+  #dominio .titolo .jp { font-size: clamp(34px, 10vw, 76px); font-weight: 800; letter-spacing: .15em; text-shadow: 0 0 30px var(--blu); }
+  #dominio .titolo .it { margin-top: 8px; letter-spacing: .4em; color: var(--blu-chiaro); text-transform: uppercase; font-size: clamp(13px, 3.5vw, 18px); }
+  #dominio .titolo .esci { margin-top: 28px; font-size: 13px; color: var(--muted); }
+  #dominio .lampo { position: absolute; inset: 0; background: #fff; animation: lampo .7s forwards; pointer-events: none; }
+  @keyframes appari { from { opacity: 0; transform: scale(.9); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes lampo { to { opacity: 0; } }
+
+  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 16px 56px; border-top: 1px solid var(--line); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stelle"></canvas>
+
+<!-- ======================= HERO ======================= -->
+<section id="hero">
+  <svg id="volto" viewBox="0 0 400 300" role="img" aria-label="Gojo con la benda: tocca per togliergliela">
+    <defs>
+      <radialGradient id="g-iride" cx="50%" cy="45%" r="55%">
+        <stop offset="0" stop-color="#ffffff"/>
+        <stop offset=".25" stop-color="#d9f6ff"/>
+        <stop offset=".55" stop-color="#6fd3ff"/>
+        <stop offset=".85" stop-color="#1f7ee0"/>
+        <stop offset="1" stop-color="#0b3f8f"/>
+      </radialGradient>
+      <filter id="bagliore" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="6" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <linearGradient id="g-pelle" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#f6e2d3"/>
+        <stop offset="1" stop-color="#e9c9b4"/>
+      </linearGradient>
+      <linearGradient id="g-capelli" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffffff"/>
+        <stop offset="1" stop-color="#d7e2f2"/>
+      </linearGradient>
+    </defs>
+
+    <!-- viso -->
+    <path d="M95 110 Q95 250 200 290 Q305 250 305 110 Z" fill="url(#g-pelle)"/>
+
+    <!-- occhi (si vedono quando la benda sale) -->
+    <g id="occhi" filter="url(#bagliore)">
+      <g transform="translate(145 168)">
+        <path d="M-42 0 Q0 -30 42 0 Q0 22 -42 0 Z" fill="#fff"/>
+        <circle class="iride" r="17" fill="url(#g-iride)"/>
+        <circle r="5" fill="#0a2a66"/>
+        <circle cx="-6" cy="-6" r="4" fill="#fff"/>
+        <path d="M-46 -2 Q0 -36 46 -2" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+        <path d="M-40 -14 l-10 -8 M-30 -22 l-6 -10 M30 -22 l6 -10 M40 -14 l10 -8" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(255 168)">
+        <path d="M-42 0 Q0 -30 42 0 Q0 22 -42 0 Z" fill="#fff"/>
+        <circle class="iride" r="17" fill="url(#g-iride)"/>
+        <circle r="5" fill="#0a2a66"/>
+        <circle cx="-6" cy="-6" r="4" fill="#fff"/>
+        <path d="M-46 -2 Q0 -36 46 -2" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+        <path d="M-40 -14 l-10 -8 M-30 -22 l-6 -10 M30 -22 l6 -10 M40 -14 l10 -8" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+      </g>
+    </g>
+
+    <!-- capelli bianchi sparati in su -->
+    <path fill="url(#g-capelli)" d="
+      M70 150 L60 105 L30 95 L65 80 L40 40 L90 60 L95 10 L130 50 L160 0 L180 45
+      L215 2 L230 45 L270 8 L275 55 L320 25 L315 70 L365 60 L335 95 L370 110 L330 120
+      L330 150 L300 120 L285 140 L265 112 L240 135 L220 110 L200 132 L180 108 L160 135
+      L135 112 L115 140 L100 118 Z"/>
+
+    <!-- benda -->
+    <g id="benda">
+      <path d="M78 140 Q200 120 322 140 L326 196 Q200 178 74 196 Z" fill="#111320"/>
+      <path d="M78 140 Q200 120 322 140" fill="none" stroke="#2a2f4a" stroke-width="2"/>
+      <path d="M74 196 Q200 178 326 196" fill="none" stroke="#2a2f4a" stroke-width="2"/>
+      <path d="M100 152 Q200 136 300 152 M98 172 Q200 156 302 172" fill="none" stroke="#1b1f33" stroke-width="3"/>
+    </g>
+  </svg>
+
+  <p class="nome-jp">五条悟</p>
+  <p class="nome">Satoru Gojo</p>
+  <p class="motto">«Nei cieli e sulla terra, io solo sono l'onorato.»</p>
+
+  <div class="bottoni">
+    <button class="btn" id="togli">Togli la benda 👁️</button>
+    <button class="btn viola" id="espandi">Espansione del dominio</button>
+    <a class="btn" href="#galleria">Galleria ↓</a>
+  </div>
+  <p class="hint">Tocca il viso per togliere (e rimettere) la benda.</p>
+</section>
+
+<!-- ======================= SCHEDA ======================= -->
+<section id="scheda">
+  <h2><small>PROFILO</small>Lo stregone più forte</h2>
+  <p class="sotto">Lo sa lui, lo sanno tutti. Soprattutto lui.</p>
+  <div class="scheda">
+    <div class="voce"><b>Nome</b>Satoru Gojo · 五条悟</div>
+    <div class="voce"><b>Età</b>28 anni</div>
+    <div class="voce"><b>Grado</b>Stregone di grado speciale</div>
+    <div class="voce"><b>Lavoro</b>Insegnante al Jujutsu High di Tokyo</div>
+    <div class="voce"><b>Clan</b>Gojo</div>
+    <div class="voce"><b>Tecnica</b>Illimitato + Sei Occhi</div>
+    <div class="voce"><b>Altezza</b>Oltre 190 cm</div>
+    <div class="voce"><b>Debolezza</b>I dolci (non sa dire di no)</div>
+  </div>
+</section>
+
+<!-- ======================= TECNICHE ======================= -->
+<section id="tecniche">
+  <h2><small>TECNICHE</small>Illimitato</h2>
+  <p class="sotto">Tocca una sfera per vederla in azione.</p>
+  <div class="tecniche">
+    <div class="tecnica">
+      <div class="sfera infinito"></div>
+      <div class="jp">無下限</div>
+      <h3>Infinito</h3>
+      <p>Tra lui e il resto del mondo c'è uno spazio infinito. Puoi provare a toccarlo: non ci arriverai mai.</p>
+    </div>
+    <div class="tecnica">
+      <div class="sfera" style="--c: var(--blu)"></div>
+      <div class="jp">術式順転「蒼」</div>
+      <h3>Blu</h3>
+      <p>Il vuoto che attira tutto verso un punto. Alberi, muri, maledizioni: tutto dentro.</p>
+    </div>
+    <div class="tecnica">
+      <div class="sfera" style="--c: var(--rosso)"></div>
+      <div class="jp">術式反転「赫」</div>
+      <h3>Rosso</h3>
+      <p>La tecnica invertita: respinge con una forza esplosiva qualsiasi cosa abbia davanti.</p>
+    </div>
+    <div class="tecnica">
+      <div class="sfera" style="--c: var(--viola)"></div>
+      <div class="jp">虚式「茈」</div>
+      <h3>Viola</h3>
+      <p>Blu e Rosso insieme. Cancella dalla mappa quello che tocca. Ciao.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= GALLERIA ======================= -->
+<section id="galleria">
+  <h2><small>GALLERIA</small>Gojo, ovunque</h2>
+  <p class="sotto">Fanart e cosplay. Tocca una foto per vederla in grande.</p>
+  <div class="filtri" role="group" aria-label="Filtra la galleria">
+    <button class="filtro" data-tipo="tutte" aria-pressed="true">Tutte</button>
+    <button class="filtro" data-tipo="fanart" aria-pressed="false">Fanart</button>
+    <button class="filtro" data-tipo="cosplay" aria-pressed="false">Cosplay</button>
+  </div>
+  <div id="griglia"></div>
+</section>
+
+<footer>
+  Fan site non ufficiale fatto con amore (e un po' di ossessione).<br>
+  Jujutsu Kaisen e i suoi personaggi © Gege Akutami / Shueisha.
+  Fanart e foto appartengono ai rispettivi autori e cosplayer, citati su ogni foto.
+</footer>
+
+<!-- lightbox -->
+<div id="lb" role="dialog" aria-modal="true" aria-label="Foto ingrandita">
+  <button class="chiudi" aria-label="Chiudi">×</button>
+  <button class="prec" aria-label="Foto precedente">‹</button>
+  <img alt="">
+  <div class="didascalia"></div>
+  <button class="succ" aria-label="Foto successiva">›</button>
+</div>
+
+<!-- espansione del dominio -->
+<div id="dominio" aria-hidden="true">
+  <canvas></canvas>
+  <div class="titolo">
+    <div class="it">Espansione del dominio</div>
+    <div class="jp">無量空処</div>
+    <div class="it">Vuoto infinito</div>
+    <div class="esci">tocca per uscire (se ci riesci)</div>
+  </div>
+</div>
+
+<script>
+/*
+  GALLERIA
+  Metti le immagini in gojo/assets/foto/ e aggiungi una riga qui sotto per ognuna:
+    src     percorso dell'immagine
+    tipo    "fanart" oppure "cosplay"
+    autore  nome/@ dell'artista o del cosplayer (viene mostrato sulla foto)
+    link    (facoltativo) profilo dell'autore
+  Usa solo foto che puoi pubblicare: le tue, oppure con il permesso dell'autore.
+*/
+var FOTO = [
+  // { src: "assets/foto/esempio.jpg", tipo: "cosplay", autore: "@nome_cosplayer", link: "https://instagram.com/nome_cosplayer" },
+];
+
+(function () {
+  var riduci = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- stelle di sfondo ---------- */
+  var cv = document.getElementById('stelle'), cx = cv.getContext('2d'), stelle = [];
+  function dimensiona() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
+    cv.style.width = innerWidth + 'px'; cv.style.height = innerHeight + 'px';
+    cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    stelle = [];
+    var n = Math.round(innerWidth * innerHeight / 5000);
+    for (var i = 0; i < n; i++) {
+      stelle.push({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, r: Math.random() * 1.3 + .2, v: Math.random() * .15 + .03, f: Math.random() * 6 });
+    }
+  }
+  function disegnaStelle(t) {
+    cx.clearRect(0, 0, innerWidth, innerHeight);
+    for (var i = 0; i < stelle.length; i++) {
+      var s = stelle[i];
+      if (!riduci) { s.y -= s.v; if (s.y < 0) s.y = innerHeight; }
+      cx.globalAlpha = .35 + .35 * Math.sin(t / 900 + s.f);
+      cx.fillStyle = '#cfe9ff';
+      cx.beginPath(); cx.arc(s.x, s.y, s.r, 0, 6.283); cx.fill();
+    }
+    if (!riduci) requestAnimationFrame(disegnaStelle);
+  }
+  addEventListener('resize', dimensiona);
+  dimensiona(); requestAnimationFrame(disegnaStelle);
+
+  /* ---------- benda ---------- */
+  var volto = document.getElementById('volto'), togli = document.getElementById('togli');
+  function benda() {
+    var su = volto.classList.toggle('svelato');
+    togli.textContent = su ? 'Rimetti la benda 🙈' : 'Togli la benda 👁️';
+  }
+  volto.addEventListener('click', benda);
+  togli.addEventListener('click', benda);
+
+  /* ---------- sfere: piccola "esplosione" al tocco ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.sfera'), function (s) {
+    s.style.cursor = 'pointer';
+    s.addEventListener('click', function () {
+      if (!s.animate) return;
+      s.animate([{ transform: 'scale(1)' }, { transform: 'scale(2.4)', filter: 'brightness(2)' }, { transform: 'scale(1)' }],
+                { duration: 650, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    });
+  });
+
+  /* ---------- galleria ---------- */
+  var griglia = document.getElementById('griglia'), filtro = 'tutte', visibili = [];
+
+  function mostra() {
+    griglia.innerHTML = '';
+    visibili = FOTO.filter(function (f) { return filtro === 'tutte' || f.tipo === filtro; });
+    if (!visibili.length) {
+      var testi = ['Le foto stanno arrivando…', 'Gojo si sta mettendo in posa', 'Qui ci starà benissimo', 'Infinito caricamento…', 'Torna presto 👁️', 'Spazio riservato al più forte'];
+      [200, 260, 180, 240, 210, 250].forEach(function (h, i) {
+        var d = document.createElement('div');
+        d.className = 'vuota'; d.style.height = h + 'px'; d.textContent = testi[i];
+        griglia.appendChild(d);
+      });
+      return;
+    }
+    visibili.forEach(function (f, i) {
+      var fig = document.createElement('figure');
+      fig.className = 'foto';
+      var img = document.createElement('img');
+      img.src = f.src; img.loading = 'lazy';
+      img.alt = (f.tipo === 'cosplay' ? 'Cosplay di Gojo' : 'Fanart di Gojo') + (f.autore ? ' di ' + f.autore : '');
+      var cap = document.createElement('figcaption');
+      cap.innerHTML = '<span class="tag ' + f.tipo + '">' + f.tipo + '</span>';
+      if (f.autore) cap.appendChild(document.createTextNode(f.autore));
+      fig.appendChild(img); fig.appendChild(cap);
+      fig.addEventListener('click', function () { apri(i); });
+      griglia.appendChild(fig);
+    });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.filtro'), function (b) {
+    b.addEventListener('click', function () {
+      filtro = b.dataset.tipo;
+      Array.prototype.forEach.call(document.querySelectorAll('.filtro'), function (x) {
+        x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+      });
+      mostra();
+    });
+  });
+  mostra();
+
+  /* ---------- lightbox ---------- */
+  var lb = document.getElementById('lb'), lbImg = lb.querySelector('img'), lbCap = lb.querySelector('.didascalia'), corrente = 0;
+  function apri(i) {
+    corrente = (i + visibili.length) % visibili.length;
+    var f = visibili[corrente];
+    lbImg.src = f.src; lbImg.alt = griglia.children[corrente].querySelector('img').alt;
+    lbCap.innerHTML = '';
+    if (f.autore) {
+      lbCap.appendChild(document.createTextNode((f.tipo === 'cosplay' ? 'Cosplay: ' : 'Arte: ')));
+      if (f.link) {
+        var a = document.createElement('a');
+        a.href = f.link; a.target = '_blank'; a.rel = 'noopener'; a.textContent = f.autore;
+        lbCap.appendChild(a);
+      } else {
+        lbCap.appendChild(document.createTextNode(f.autore));
+      }
+    }
+    lb.classList.add('aperto');
+  }
+  function chiudi() { lb.classList.remove('aperto'); }
+  lb.querySelector('.chiudi').addEventListener('click', chiudi);
+  lb.querySelector('.prec').addEventListener('click', function () { apri(corrente - 1); });
+  lb.querySelector('.succ').addEventListener('click', function () { apri(corrente + 1); });
+  lb.addEventListener('click', function (e) { if (e.target === lb) chiudi(); });
+  var x0 = null;
+  lb.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  lb.addEventListener('touchend', function (e) {
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 50) apri(corrente + (dx < 0 ? 1 : -1));
+  });
+
+  /* ---------- espansione del dominio: Vuoto infinito ---------- */
+  var dom = document.getElementById('dominio'), dcv = dom.querySelector('canvas'), dcx = dcv.getContext('2d'), particelle = [], attivo = false;
+
+  function espandi() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dcv.width = innerWidth * dpr; dcv.height = innerHeight * dpr;
+    dcx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    particelle = [];
+    for (var i = 0; i < 700; i++) {
+      particelle.push({ a: Math.random() * 6.283, d: Math.random() * Math.max(innerWidth, innerHeight), v: Math.random() * 2 + .5, h: 190 + Math.random() * 90 });
+    }
+    // riavvia le animazioni CSS del titolo e del lampo
+    var vecchio = dom.querySelector('.lampo'); if (vecchio) vecchio.remove();
+    var titolo = dom.querySelector('.titolo'); titolo.style.animation = 'none'; void titolo.offsetWidth; titolo.style.animation = '';
+    var lampo = document.createElement('div'); lampo.className = 'lampo'; dom.appendChild(lampo);
+    dom.classList.add('attivo'); dom.setAttribute('aria-hidden', 'false');
+    attivo = true; document.body.style.overflow = 'hidden';
+    requestAnimationFrame(vortice);
+  }
+  function vortice() {
+    if (!attivo) return;
+    var w = innerWidth, h = innerHeight, cxm = w / 2, cym = h / 2;
+    dcx.fillStyle = 'rgba(0, 0, 0, .18)';
+    dcx.fillRect(0, 0, w, h);
+    for (var i = 0; i < particelle.length; i++) {
+      var p = particelle[i];
+      p.a += p.v / Math.max(p.d, 40);
+      p.d -= p.v * .6;
+      if (p.d < 2) p.d = Math.max(w, h) * .75;
+      var x = cxm + Math.cos(p.a) * p.d, y = cym + Math.sin(p.a) * p.d * .8;
+      dcx.fillStyle = 'hsla(' + p.h + ', 100%, ' + (60 + 30 * (1 - p.d / Math.max(w, h))) + '%, .9)';
+      dcx.fillRect(x, y, 2, 2);
+    }
+    var g = dcx.createRadialGradient(cxm, cym, 0, cxm, cym, 90);
+    g.addColorStop(0, 'rgba(255,255,255,.9)'); g.addColorStop(.3, 'rgba(120,200,255,.4)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    dcx.fillStyle = g; dcx.fillRect(cxm - 90, cym - 90, 180, 180);
+    if (!riduci) requestAnimationFrame(vortice);
+  }
+  function richiudi() {
+    attivo = false;
+    dom.classList.remove('attivo'); dom.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('espandi').addEventListener('click', espandi);
+  dom.addEventListener('click', richiudi);
+
+  addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { chiudi(); richiudi(); }
+    if (lb.classList.contains('aperto')) {
+      if (e.key === 'ArrowLeft') apri(corrente - 1);
+      if (e.key === 'ArrowRight') apri(corrente + 1);
+    }
+  });
+})();
+</script>
+</body>
+</html>
