@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Verifica di sicurezza</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root {
+    --bg: #eef1f5;
+    --card: #ffffff;
+    --ink: #1d2733;
+    --muted: #6b7785;
+    --line: #dfe4ea;
+    --accent: #2f6fdb;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    cursor: pointer;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 28px 24px 24px;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(16,24,40,.06), 0 8px 24px rgba(16,24,40,.06);
+  }
+  .shield {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 14px;
+    display: block;
+    color: var(--accent);
+  }
+  h1 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    letter-spacing: -.01em;
+  }
+  p.sub {
+    margin: 0 0 22px;
+    color: var(--muted);
+    font-size: 13.5px;
+  }
+  .count {
+    font-size: 34px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.02em;
+  }
+  .count span { color: var(--muted); font-size: 18px; font-weight: 500; }
+  .bar {
+    height: 6px;
+    background: var(--line);
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 14px 0 12px;
+  }
+  .fill {
+    height: 100%;
+    width: 0;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width .18s ease-out;
+  }
+  .status {
+    font-size: 12.5px;
+    color: var(--muted);
+    min-height: 18px;
+  }
+  .foot {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+    color: #9aa4b0;
+  }
+
+  /* --- il colpo --- */
+  #blast {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: none;
+    z-index: 9999;
+    cursor: default;
+  }
+  #blast.on { display: block; }
+  #blast img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* la gif è quadrata: 'cover' taglierebbe la scritta sugli schermi larghi */
+    image-rendering: pixelated;
+    animation: pulse 1.1s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.03); } /* oltre, la scritta rischia di uscire dai bordi */
+  }
+</style>
+</head>
+<body>
+
+<div class="card" id="card">
+  <svg class="shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+    <path d="M9 12l2 2 4-4"></path>
+  </svg>
+  <h1>Verifica di sicurezza</h1>
+  <p class="sub">Per continuare, conferma di non essere un bot.<br>Clicca <strong>30 volte</strong> in un punto qualsiasi dello schermo.</p>
+
+  <div class="count"><b id="n">0</b><span> / 30</span></div>
+  <div class="bar"><div class="fill" id="fill"></div></div>
+  <div class="status" id="status">In attesa del primo click…</div>
+
+  <div class="foot">ID sessione 8F2C-41A9 · Protezione anti-automazione</div>
+</div>
+
+<div id="blast" aria-hidden="true">
+  <img src="assets/v.gif" alt="">
+</div>
+<audio id="snd" src="assets/boom.mp3" preload="auto" loop></audio>
+
+<script>
+(function () {
+  var TARGET = 30;
+  var clicks = 0;
+  var fired = false;
+  var canStop = false;
+
+  var nEl = document.getElementById('n');
+  var fillEl = document.getElementById('fill');
+  var statusEl = document.getElementById('status');
+  var blastEl = document.getElementById('blast');
+
+  /* --- audio: mp3 nel repo, spinto oltre il 100% con WebAudio --- */
+  var sndEl = document.getElementById('snd');
+  var ctx = null, srcNode = null, boost = null;
+  var blasting = false;   // lo sblocco non deve mettere in pausa il blast gia' partito
+
+  function unlockAudio() {
+    // il primo click serve a sbloccare: i browser (iOS in testa) pretendono
+    // che un play() parta da un gesto dell'utente, se no al 30esimo resta muto
+    if (!ctx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) ctx = new AC();
+    }
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+    if (sndEl && !sndEl.dataset.unlocked) {
+      sndEl.dataset.unlocked = '1';
+      sndEl.muted = true;
+      var pr = sndEl.play();
+      if (pr && pr.then) {
+        pr.then(function () {
+          sndEl.muted = false;
+          if (blasting) return;   // altrimenti la pausa qui sotto ammazza l'audio buono
+          sndEl.pause();
+          sndEl.currentTime = 0;
+        }).catch(function () { sndEl.muted = false; });
+      } else {
+        sndEl.pause(); sndEl.currentTime = 0; sndEl.muted = false;
+      }
+    }
+  }
+
+  function blastAudio() {
+    if (!sndEl) return;
+    blasting = true;
+    unlockAudio();
+
+    // il gain a 4 supera il volume massimo normale di un tag <audio>:
+    // satura un po', ed e' esattamente quello che vogliamo
+    if (ctx && !srcNode) {
+      try {
+        srcNode = ctx.createMediaElementSource(sndEl);
+        boost = ctx.createGain();
+        boost.gain.value = 4;
+        srcNode.connect(boost);
+        boost.connect(ctx.destination);
+      } catch (e) { srcNode = null; }
+    }
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+
+    sndEl.muted = false;
+    sndEl.volume = 1;
+    sndEl.currentTime = 0;
+    sndEl.loop = true;
+    var p = sndEl.play();
+    if (p && p.catch) p.catch(function () {});
+  }
+
+  function stopAudio() {
+    blasting = false;
+    if (!sndEl) return;
+    try {
+      sndEl.pause();
+      sndEl.currentTime = 0;
+    } catch (e) {}
+  }
+
+  /* --- barra di avanzamento: rallenta verso la fine --- */
+  function paint() {
+    nEl.textContent = clicks;
+    var r = clicks / TARGET;
+    fillEl.style.width = (Math.pow(r, 1.7) * 100).toFixed(1) + '%';
+
+    if (clicks === 0)          statusEl.textContent = 'In attesa del primo click…';
+    else if (clicks < 10)      statusEl.textContent = 'Analisi del comportamento in corso…';
+    else if (clicks < 20)      statusEl.textContent = 'Confronto con i modelli noti…';
+    else if (clicks < 25)      statusEl.textContent = 'Quasi fatto, continua…';
+    else if (clicks < TARGET)  statusEl.textContent = 'Ultimi controlli… non fermarti adesso!';
+  }
+
+  function goFullscreen() {
+    var el = document.documentElement;
+    var fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    if (fn) { try { fn.call(el).catch(function () {}); } catch (e) {} }
+  }
+
+  function fire() {
+    fired = true;
+    statusEl.textContent = 'Verifica completata.';
+    goFullscreen();
+    blastEl.classList.add('on');
+    blastAudio();
+    // nessun pulsante visibile: dopo 4s un click o un tasto qualsiasi ferma tutto
+    setTimeout(function () { canStop = true; }, 4000);
+  }
+
+  function stopAll() {
+    stopAudio();
+    blastEl.classList.remove('on');
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(function () {});
+    }
+    statusEl.textContent = '';
+    document.body.style.cursor = 'default';
+  }
+
+  function onPress(e) {
+    if (fired) {
+      if (canStop) { e.preventDefault(); stopAll(); }
+      return;
+    }
+    unlockAudio();           // il primo click sblocca l'audio: i browser lo richiedono
+    clicks++;
+    paint();
+    if (clicks >= TARGET) fire();
+  }
+
+  document.addEventListener('pointerdown', onPress);
+  document.addEventListener('keydown', function (e) {
+    if (fired && canStop) { stopAll(); return; }
+    if (!fired && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); onPress(e); }
+  });
+  document.addEventListener('contextmenu', function (e) { if (fired) e.preventDefault(); });
+
+  paint();
+})();
+</script>
+</body>
+</html>

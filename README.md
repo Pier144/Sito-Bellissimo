@@ -13,6 +13,24 @@ Le zebre sono disegnate in SVG dentro la pagina e non con l'emoji 🦓, perché
 l'emoji guarda in versi diversi a seconda del telefono. L'unico suono è lo
 sparo, sintetizzato con WebAudio.
 
+## Scherzi precedenti
+
+Ripristinati così com'erano, ognuno nella sua cartella con i suoi file:
+
+- `premio/`: finto sito "HAI VINTO!!!" (ruota truccata, captcha con gli
+  iPhone, termini con l'addebito di 1799,99€ e ka-ching finale).
+- `verifica/`: finta verifica anti-bot, 30 clic poi gif "Puzzona" a schermo
+  intero col vine boom.
+
+## Aula
+
+`aula/`: finto video verticale. Si preme play (serve anche a sbloccare
+l'audio), una lezione in cerchio in aula con 20 compagni disegnati in SVG e
+lei al centro del fondo come foto scontornata (`aula/assets/lei.webp`). Dopo
+8 secondi tutti si girano verso di lei, la camera zooma con l'occhio di bue
+e parte `aula/assets/audio.mp3` (audio del TikTok, tagliato prima della
+sigla finale, normalizzato e spinto oltre il 100% con WebAudio).
+
 ## Anime Runner (`anime-runner/`)
 
 Sotto-sito a parte: runner a 3 corsie per telefono in cui si collezionano i 10
