@@ -30,16 +30,3 @@ lei al centro del fondo come foto scontornata (`aula/assets/lei.webp`). Dopo
 8 secondi tutti si girano verso di lei, la camera zooma con l'occhio di bue
 e parte `aula/assets/audio.mp3` (audio del TikTok, tagliato prima della
 sigla finale, normalizzato e spinto oltre il 100% con WebAudio).
-
-## Gojo
-
-`gojo/`: fan site dedicato a Satoru Gojo (Jujutsu Kaisen). Gojo disegnato in
-SVG con la benda: toccandolo la tira su e si vedono i Sei Occhi. Poi scheda
-del personaggio, le tecniche (Infinito, Blu, Rosso, Viola) e il bottone
-"Espansione del dominio" che apre il Vuoto infinito a schermo intero.
-
-La galleria (fanart e cosplay, con filtri e lightbox) parte vuota: metti le
-immagini in `gojo/assets/foto/` e aggiungi una riga per ognuna nell'array
-`FOTO` in cima allo script di `gojo/index.html`, con l'autore (e il link al
-profilo, se c'è), che viene mostrato sulla foto. Solo foto tue o con il
-permesso di chi le ha fatte.
