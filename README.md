@@ -43,3 +43,19 @@ I progressi restano nel `localStorage` del telefono.
 
 Per provare subito il boss: `anime-runner/#boss`. I sensori su iPhone
 funzionano solo in HTTPS (GitHub Pages va bene).
+
+## L'Oracolo (`oracolo/`)
+
+Biscotto della fortuna sotto un cielo stellato. Si tocca il biscotto, che
+trema, si spezza col "crack" (sintetizzato con WebAudio) e tira fuori il
+bigliettino; sotto compare la pergamena con la profezia e tre voti a stelle.
+
+Il giorno della prima apertura, prima del biscotto compare una lettera col
+sigillo (`MESSAGGIO`, il sushi di stasera) e il pulsante "Apri il biscotto";
+dal giorno dopo la lettera non c'è più. Le profezie del biscotto sono nella
+lista `PROFEZIE` in fondo a `oracolo/index.html`: il primo giorno esce la prima,
+poi una a caso al giorno (la stessa per tutto il giorno, mai uguale a quella
+del giorno prima), con voti di Amore, Soldi e Salute sempre diversi. Il giorno
+del primo accesso resta nel `localStorage`.
+
+Per ricominciare dalla lettera: apri `oracolo/#reset` e ricarica.

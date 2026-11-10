@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>L'Oracolo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --notte: #140b2e;
+    --notte2: #2a1452;
+    --oro: #f2c879;
+    --oro-scuro: #b98a3a;
+    --pergamena: #f6ead0;
+    --inchiostro: #3b2410;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: radial-gradient(ellipse at 50% 30%, var(--notte2) 0%, var(--notte) 70%);
+    color: var(--pergamena);
+    font-family: "Cormorant Garamond", Georgia, serif;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #stelle { position: fixed; inset: 0; pointer-events: none; }
+  .stella { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; animation: brilla 3s ease-in-out infinite; }
+  @keyframes brilla { 0%,100% { opacity: .15 } 50% { opacity: 1 } }
+
+  main { position: relative; z-index: 1; min-height: 100%; display: flex; flex-direction: column; align-items: center; padding: 40px 16px 40px; text-align: center; }
+  h1 { font-family: "Cinzel Decorative", serif; font-size: 34px; color: var(--oro); letter-spacing: 1px; text-shadow: 0 0 18px #f2c87966; }
+  .sotto { font-style: italic; font-size: 18px; opacity: .8; margin-top: 4px; }
+  .data { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: var(--oro-scuro); margin-top: 14px; }
+
+  .scena { position: relative; width: 300px; height: 250px; margin: 24px auto 6px; cursor: pointer; }
+  .alone { position: absolute; left: 50%; top: 50%; width: 300px; height: 300px; transform: translate(-50%,-50%); border-radius: 50%; background: radial-gradient(circle, #f2c87933 0%, transparent 62%); animation: respira 4s ease-in-out infinite; }
+  @keyframes respira { 0%,100% { opacity: .6; transform: translate(-50%,-50%) scale(.95) } 50% { opacity: 1; transform: translate(-50%,-50%) scale(1.05) } }
+
+  .biscotto { position: absolute; left: 50%; top: 30px; width: 280px; transform: translateX(-50%); overflow: visible; filter: drop-shadow(0 12px 16px #000a); }
+  .scena:not(.agita) .biscotto { animation: dondola 3.2s ease-in-out infinite; }
+  @keyframes dondola { 0%,100% { transform: translateX(-50%) rotate(-2deg) } 50% { transform: translateX(-50%) rotate(2deg) translateY(-4px) } }
+  .scena.agita:not(.rivelata) .biscotto { animation: trema .55s ease-in-out; }
+  @keyframes trema { 0%,100% { transform: translateX(-50%) } 20% { transform: translateX(calc(-50% - 7px)) rotate(-3deg) } 40% { transform: translateX(calc(-50% + 7px)) rotate(3deg) } 60% { transform: translateX(calc(-50% - 4px)) } 80% { transform: translateX(calc(-50% + 4px)) } }
+
+  .meta { transform-box: fill-box; transition: transform .8s cubic-bezier(.3,1.5,.5,1); }
+  .meta.sx { transform-origin: 100% 90%; }
+  .meta.dx { transform-origin: 0% 90%; }
+  .scena.rivelata .meta.sx { transform: rotate(-22deg) translate(-40px, -4px); }
+  .scena.rivelata .meta.dx { transform: rotate(22deg) translate(40px, -4px); }
+
+  .bigliettino { transform-box: fill-box; transform-origin: 50% 50%; transform: scale(.06, .55); opacity: 0; transition: transform .7s cubic-bezier(.3,1.4,.5,1) .35s, opacity .15s ease .35s; }
+  .bigliettino .scritta { opacity: 0; transition: opacity .4s ease .9s; }
+  .scena.rivelata .bigliettino { transform: none; opacity: 1; }
+  .scena.rivelata .bigliettino .scritta { opacity: 1; }
+
+  .briciole span { position: absolute; width: 7px; height: 6px; background: #d9a24a; border-radius: 2px; opacity: 0; }
+  .scena.rivelata .briciole span { animation: cade 1.1s ease-out forwards; }
+  @keyframes cade { 0% { opacity: 1; transform: translate(0,0) rotate(0) } 100% { opacity: 0; transform: translate(var(--x), 110px) rotate(220deg) } }
+
+  .invito { font-size: 19px; font-style: italic; color: var(--oro); animation: pulsa 1.8s ease-in-out infinite; }
+  @keyframes pulsa { 0%,100% { opacity: .45 } 50% { opacity: 1 } }
+
+  .pergamena { width: min(340px, 100%); margin-top: 10px; padding: 22px 22px 18px; color: var(--inchiostro);
+    background: radial-gradient(ellipse at 50% 40%, #fff8e6 0%, var(--pergamena) 60%, #e3cfa3 100%);
+    border-radius: 6px; box-shadow: 0 12px 30px #0008, inset 0 0 30px #b98a3a55;
+    opacity: 0; transform: translateY(20px) scale(.96); transition: opacity .8s ease 1s, transform .8s ease 1s; }
+  .rivelata ~ .pergamena { opacity: 1; transform: none; }
+  .pergamena .num { font-family: "Cinzel Decorative", serif; font-size: 13px; letter-spacing: 2px; color: #8a5a2b; }
+  .pergamena p { font-size: 23px; line-height: 1.25; margin: 10px 0 12px; }
+  .pergamena .voti { display: flex; justify-content: space-between; gap: 6px; font-size: 15px; border-top: 1px dashed #8a5a2b77; padding-top: 10px; }
+  .pergamena .voti span { display: flex; flex-direction: column; }
+  .pergamena .voti b { font-weight: 500; }
+  .pergamena .torna { font-style: italic; font-size: 15px; margin-top: 10px; opacity: .75; }
+
+  /* ---- Messaggio prima del biscotto (solo il primo giorno) ---- */
+  main { transition: opacity .8s ease .3s; }
+  body.con-intro main { opacity: 0; pointer-events: none; }
+  .intro { position: fixed; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; text-align: center; transition: opacity .6s ease, visibility .6s; }
+  .intro[hidden] { display: none; }
+  .intro.via { opacity: 0; visibility: hidden; }
+  .intro .sotto { margin-bottom: 26px; }
+  .lettera { position: relative; width: min(340px, 100%); padding: 40px 22px 18px; color: var(--inchiostro);
+    background: radial-gradient(ellipse at 50% 40%, #fff8e6 0%, var(--pergamena) 60%, #e3cfa3 100%);
+    border-radius: 6px; box-shadow: 0 12px 30px #0008, inset 0 0 30px #b98a3a55;
+    animation: entra .9s cubic-bezier(.3,1.3,.5,1) both .2s; }
+  @keyframes entra { from { opacity: 0; transform: translateY(30px) scale(.94) } to { opacity: 1; transform: none } }
+  .sigillo { position: absolute; left: 50%; top: -26px; width: 56px; height: 56px; transform: translateX(-50%); border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #c8383a 0%, #9e1b1b 60%, #6e0f10 100%); box-shadow: 0 4px 10px #0007, inset 0 0 0 4px #ffffff22;
+    display: flex; align-items: center; justify-content: center; color: #f6d38a; font-size: 24px; }
+  .lettera .num { font-family: "Cinzel Decorative", serif; font-size: 13px; letter-spacing: 2px; color: #8a5a2b; }
+  .lettera p { font-size: 25px; line-height: 1.25; margin: 12px 0 14px; }
+  .lettera .voti { display: flex; justify-content: space-between; gap: 6px; font-size: 15px; border-top: 1px dashed #8a5a2b77; padding-top: 10px; }
+  .lettera .voti span { display: flex; flex-direction: column; }
+  .lettera .voti b { font-weight: 500; }
+  .avanti { margin-top: 28px; font: inherit; font-size: 20px; font-style: italic; color: var(--notte); background: var(--oro); border: 0; border-radius: 99px; padding: 10px 26px; cursor: pointer; box-shadow: 0 0 22px #f2c87966; animation: entra .9s ease both 1s; }
+</style>
+</head>
+<body>
+<div id="stelle"></div>
+<div class="intro" id="intro" hidden>
+  <div class="sotto">Prima di consultare l'oracolo…</div>
+  <div class="lettera">
+    <div class="sigillo">♥</div>
+    <div class="num">Un messaggio per te</div>
+    <p id="messaggio"></p>
+    <div class="voti" id="votiIntro"></div>
+  </div>
+  <button class="avanti" id="avanti">Apri il biscotto</button>
+</div>
+<main>
+  <h1>L'Oracolo</h1>
+  <div class="sotto">Le stelle hanno parlato. Purtroppo.</div>
+  <div class="data" id="data"></div>
+
+  <div class="scena" id="scena">
+    <div class="alone"></div>
+    <svg class="biscotto" viewBox="0 0 280 190" aria-label="Biscotto della fortuna">
+      <defs>
+        <linearGradient id="pasta" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f9dc98"/><stop offset=".55" stop-color="#e6aa52"/><stop offset="1" stop-color="#b8772a"/>
+        </linearGradient>
+        <linearGradient id="ombra" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#a86b1e" stop-opacity="0"/><stop offset="1" stop-color="#8a5418" stop-opacity=".55"/>
+        </linearGradient>
+      </defs>
+      <g class="meta sx">
+        <path d="M141 36 C82 36 30 70 28 120 C27 146 52 156 76 142 C100 128 122 128 141 140 Z" fill="url(#pasta)" stroke="#a86b1e" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M141 44 C112 70 88 104 72 140 C98 128 122 128 141 140 Z" fill="url(#ombra)"/>
+        <path d="M141 44 C112 70 88 104 72 140" stroke="#a86b1e" stroke-width="2.5" fill="none" opacity=".6"/>
+        <path d="M58 76 C76 56 102 46 124 44" stroke="#fff4cf" stroke-width="6" stroke-linecap="round" fill="none" opacity=".6"/>
+      </g>
+      <g class="meta dx">
+        <path d="M139 36 C198 36 250 70 252 120 C253 146 228 156 204 142 C180 128 158 128 139 140 Z" fill="url(#pasta)" stroke="#a86b1e" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M139 44 C168 70 192 104 208 140 C182 128 158 128 139 140 Z" fill="url(#ombra)"/>
+        <path d="M139 44 C168 70 192 104 208 140" stroke="#a86b1e" stroke-width="2.5" fill="none" opacity=".6"/>
+      </g>
+      <g class="bigliettino">
+        <rect x="24" y="126" width="232" height="34" rx="2" fill="#fffaf0" stroke="#d8c7a0"/>
+        <text class="scritta" id="scritta" x="140" y="150" text-anchor="middle" transform="rotate(-2 140 144)" font-family="Caveat, cursive" font-weight="600" font-size="23" fill="#24346e"></text>
+      </g>
+    </svg>
+    <div class="briciole">
+      <span style="left:138px;top:170px;--x:-50px"></span>
+      <span style="left:146px;top:172px;--x:12px"></span>
+      <span style="left:154px;top:170px;--x:52px"></span>
+      <span style="left:142px;top:166px;--x:-20px"></span>
+      <span style="left:150px;top:166px;--x:30px"></span>
+      <span style="left:146px;top:168px;--x:-4px"></span>
+    </div>
+  </div>
+
+  <div class="invito" id="invito">Rompi il biscotto per conoscere il tuo destino</div>
+
+  <div class="pergamena">
+    <div class="num" id="num"></div>
+    <p id="profezia"></p>
+    <div class="voti" id="voti"></div>
+    <div class="torna">L'oracolo riposa. Torna domani per un'altra profezia.</div>
+  </div>
+</main>
+
+<script>
+  // Messaggio mostrato prima del biscotto, solo il giorno della prima apertura.
+  const MESSAGGIO = {
+    testo: "Stasera sushi, so che sei a dieta quindi per te solo il biscotto Ily",
+    voti: [["Sushi", 5], ["Dieta", 1], ["Biscotto", 5]]
+  };
+
+  // La prima esce il giorno della prima apertura, poi una a caso al giorno
+  // (sempre la stessa per tutto il giorno, mai uguale a quella del giorno prima).
+  const PROFEZIE = [
+    ["Sei un documentario", "Oggi sarai la protagonista. Di un documentario sui bradipi, narrato a bassa voce."],
+    ["Un'oca ti sta cercando", "Un'oca ti sta cercando. Non sa perché. Nemmeno tu. Continua a camminare."],
+    ["Il procione trama", "Da qualche parte un procione sta preparando qualcosa. Non chiedere cosa. Stai all'erta."],
+    ["Un altro caso umano", "Le stelle si sono riunite per discutere il tuo destino. Hanno deciso che troverai un altro caso umano."],
+    ["Evita i ponti. Così.", "Oggi evita i ponti. Non c'è un motivo. Evitali e basta."],
+    ["Il gamberetto ti guida", "Il tuo animale guida di oggi è un gamberetto confuso. Seguilo con fiducia."],
+    ["+1000 aura (poi -999)", "Oggi guadagnerai +1000 aura. Poi inciamperai davanti a tutti: -999. Resta comunque +1."],
+    ["Il piccione ha la P.IVA", "Un piccione ha aperto una partita IVA a tuo nome. Non firmare niente."],
+    ["Un cavallo capirà", "Un cavallo ti guarderà negli occhi e capirà tutto. Tutto. Anche quella cosa."],
+    ["Il cucchiaio ti osserva", "Il cucchiaio nel cassetto ti osserva da settimane. Oggi lo guarderai anche tu. Imbarazzo."],
+    ["La lavatrice ha fame", "Un calzino sparirà nella lavatrice. Non è un incidente: è un sacrificio. Lei ne vuole un altro."],
+    ["Il frigo ronza in codice", "Il frigo stanotte ronzerà in codice Morse. Il messaggio è «ok». Solo «ok»."]
+  ];
+  const CATEGORIE = ["Amore", "Soldi", "Salute"];
+
+  const CHIAVE = "oracolo.primoGiorno";
+  const oggi = new Date();
+  const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  const oggiIso = iso(oggi);
+
+  function leggi() { try { return localStorage.getItem(CHIAVE); } catch (e) { return null; } }
+  function scrivi(v) { try { localStorage.setItem(CHIAVE, v); } catch (e) {} }
+  function cancella() { try { localStorage.removeItem(CHIAVE); } catch (e) {} }
+
+  // oracolo/#reset fa ripartire tutto dalla profezia speciale.
+  if (location.hash === "#reset") { cancella(); history.replaceState(null, "", location.pathname); }
+
+  let primo = leggi();
+  if (!primo) { primo = oggiIso; scrivi(primo); }
+  const giorni = Math.round((new Date(oggiIso) - new Date(primo)) / 86400000);
+
+  const giorno = Math.max(0, giorni);
+  function rnd(s) {
+    s = (s + 0x6D2B79F5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  }
+  let indice = 0;
+  for (let d = 1; d <= giorno; d++) {
+    let r = Math.floor(rnd(d * 7919) * (PROFEZIE.length - 1));
+    if (r >= indice) r++;
+    indice = r;
+  }
+  const [corta, lunga] = PROFEZIE[indice];
+  let seme = (giorno + 1) * 7919 % 233280;
+  const caso = () => (seme = (seme * 9301 + 49297) % 233280) / 233280;
+  const voti = CATEGORIE.map(c => [c, 1 + Math.floor(caso() * 5)]);
+
+  function mostraVoti(box, lista) {
+    lista.forEach(([c, n]) => {
+      const s = document.createElement("span");
+      const b = document.createElement("b");
+      s.textContent = c;
+      b.textContent = "★".repeat(n) + "☆".repeat(5 - n);
+      s.appendChild(b);
+      box.appendChild(s);
+    });
+  }
+
+  document.getElementById("data").textContent = oggi.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
+  document.getElementById("num").textContent = "Profezia n. " + (giorno + 1);
+  document.getElementById("scritta").textContent = corta;
+  document.getElementById("profezia").textContent = lunga;
+  mostraVoti(document.getElementById("voti"), voti);
+
+  if (giorno === 0) {
+    const intro = document.getElementById("intro");
+    document.getElementById("messaggio").textContent = MESSAGGIO.testo;
+    mostraVoti(document.getElementById("votiIntro"), MESSAGGIO.voti);
+    intro.hidden = false;
+    document.body.classList.add("con-intro");
+    document.getElementById("avanti").addEventListener("click", () => {
+      intro.classList.add("via");
+      document.body.classList.remove("con-intro");
+    });
+  }
+
+  const stelle = document.getElementById("stelle");
+  for (let i = 0; i < 70; i++) {
+    const s = document.createElement("div");
+    s.className = "stella";
+    s.style.left = Math.random() * 100 + "%";
+    s.style.top = Math.random() * 100 + "%";
+    s.style.animationDelay = (Math.random() * 3) + "s";
+    if (Math.random() < .2) { s.style.width = s.style.height = "3px"; }
+    stelle.appendChild(s);
+  }
+
+  // Crack del biscotto: rumore filtrato, niente file audio.
+  function crack() {
+    try {
+      const ac = new (window.AudioContext || window.webkitAudioContext)();
+      [0, .07, .16].forEach((t, k) => {
+        const dur = .09;
+        const buf = ac.createBuffer(1, Math.floor(ac.sampleRate * dur), ac.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+        const src = ac.createBufferSource(); src.buffer = buf;
+        const f = ac.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 1800 + k * 700; f.Q.value = .8;
+        const g = ac.createGain(); g.gain.value = .9 - k * .25;
+        src.connect(f).connect(g).connect(ac.destination);
+        src.start(ac.currentTime + t);
+      });
+    } catch (e) {}
+  }
+
+  const scena = document.getElementById("scena");
+  scena.addEventListener("click", () => {
+    if (scena.classList.contains("agita")) return;
+    scena.classList.add("agita");
+    crack();
+    document.getElementById("invito").hidden = true;
+    setTimeout(() => scena.classList.add("rivelata"), 550);
+  });
+</script>
+</body>
+</html>
