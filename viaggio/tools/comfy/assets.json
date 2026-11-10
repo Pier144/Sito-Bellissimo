@@ -38,7 +38,7 @@
     },
     {
       "nome": "radice",
-      "prompt": "tree root, gnarled wooden root sticking out of the dirt, object focus",
+      "prompt": "tree root, brown wooden root arching out of the ground, object focus",
       "altezza": 17,
       "colori": 14
     },
@@ -68,7 +68,7 @@
     },
     {
       "nome": "monopattino",
-      "prompt": "electric kick scooter, vehicle focus",
+      "prompt": "kick scooter, electric scooter with tall handlebar and flat standing deck, two small wheels, no seat, vehicle focus",
       "altezza": 37,
       "colori": 18
     },
@@ -86,7 +86,7 @@
     },
     {
       "nome": "snack",
-      "prompt": "cookie package, bag of chocolate chip cookies, snack, food focus",
+      "prompt": "cookie, one round chocolate chip cookie, food focus",
       "altezza": 20,
       "colori": 16
     },
@@ -122,7 +122,7 @@
     },
     {
       "nome": "cuffia",
-      "prompt": "swim cap, blue swimming cap, object focus",
+      "prompt": "swimming cap, blue rubber swim cap, headwear only, object focus",
       "altezza": 20,
       "colori": 14
     },
@@ -134,7 +134,7 @@
     },
     {
       "nome": "ciabatta",
-      "prompt": "slipper, white spa slipper, object focus",
+      "prompt": "flip-flop, single white flip flop sandal, object focus",
       "altezza": 17,
       "colori": 14
     },
@@ -146,7 +146,7 @@
     },
     {
       "nome": "braccialetto",
-      "prompt": "wristband, rubber spa wristband with a locker key, object focus",
+      "prompt": "bracelet, blue rubber wristband with a small metal key attached, object focus",
       "altezza": 17,
       "colori": 14
     },
