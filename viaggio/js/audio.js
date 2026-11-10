@@ -19,7 +19,7 @@
         const d = rumore.getChannelData(0);
         for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
       }
-      if (ac.state === 'suspended') {
+      if (ac.state === 'suspended' || ac.state === 'interrupted') {   // 'interrupted': iOS dopo una chiamata o Siri
         const r = ac.resume();
         if (r && r.catch) r.catch(() => {});
       }

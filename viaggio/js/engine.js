@@ -125,6 +125,7 @@
           S.relax = 0;
           if (p.tenendo) V.rilasciaSalto(p);
           V.posa(p, 'stanca', 2.5); suona('stanca');
+          m.icona = null;
           vai('stanca');
         }
         break;
@@ -152,9 +153,11 @@
 
   /* ---------- disegno ---------- */
   function disegna() {
+    const fase = S.fase === 'pausa' ? sospesa : S.fase;   // in pausa da intro/falò il mondo è vecchio: non va mostrato
     if (S.fase === 'titolo') V.disegna(ctx, { m: vetrina, p: null, hud: false, tempo: orologio });
-    else if (S.m && (S.fase === 'gioco' || S.fase === 'stanca' || S.fase === 'pausa')) {
-      V.disegna(ctx, { m: S.m, p: S.p, relax: S.relax, stats: S.stats, n: S.n, tempo, effetti });
+    else if (S.m && (fase === 'gioco' || fase === 'stanca')) {
+      V.disegna(ctx, { m: S.m, p: S.p, relax: S.relax, stats: S.stats, n: S.n, tempo, effetti,
+        ricordiGiorno: S.stats.ricordi.length - S.statsInizio.ricordi.length });
     } else V.disegna(ctx, { m: null });
 
     for (const c of tele) {
@@ -203,14 +206,16 @@
 
   function ridimensiona() {
     const w = window.innerWidth, h = window.innerHeight;
-    const fit = Math.min(w / V.W, h / V.H);
-    let s = Math.max(1, Math.floor(fit));
-    // scala intera se riempie abbastanza, altrimenti frazionaria (meglio pixel non uniformi che gioco minuscolo)
-    if (fit < 1 || 1 - s / fit > 0.3) s = fit;
-    const sc = $('scena'), cw = Math.round(V.W * s), ch = Math.round(V.H * s);
+    const dpr = window.devicePixelRatio || 1, fit = Math.min(w / V.W, h / V.H);
+    // ogni pixel logico = un numero intero di pixel del dispositivo
+    let s = Math.max(1, Math.floor(fit * dpr)) / dpr;
+    // se così resta più del 30% vuoto, scala frazionaria (meglio pixel non uniformi che gioco minuscolo)
+    if (s > fit || 1 - s / fit > 0.3) s = fit;
+    const px = v => Math.round(v * dpr) / dpr;   // allinea ai pixel del dispositivo
+    const sc = $('scena'), cw = px(V.W * s), ch = px(V.H * s);
     sc.style.width = cw + 'px'; sc.style.height = ch + 'px';
-    sc.style.left = Math.round((w - cw) / 2) + 'px'; sc.style.top = Math.round((h - ch) / 2) + 'px';
-    sc.style.setProperty('--s', s.toFixed(3));
+    sc.style.left = px((w - cw) / 2) + 'px'; sc.style.top = px((h - ch) / 2) + 'px';
+    sc.style.setProperty('--s', s.toFixed(4));
     controllaOrientamento();
   }
 
@@ -220,7 +225,7 @@
       case 'gioco':
         if (S.m.finito) return;
         if (sinistra) { if (V.premiSalto(S.p)) { suona('salto'); pointerSalto = id; } }
-        else V.azioneMondo(S.m, S.p, avvisa);
+        else if (S.p.anim !== 'pisolino') V.azioneMondo(S.m, S.p, avvisa);
         break;
       case 'intro': iniziaGiorno(1); break;
       case 'falo': if (macchina && !macchina.completo) completa(); else iniziaGiorno(S.n + 1); break;
@@ -260,8 +265,13 @@
     sbloccaAudio();
     try {
       const de = document.documentElement;
-      if (de.requestFullscreen) { const r = de.requestFullscreen(); if (r && r.catch) r.catch(() => {}); }
-      if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});
+      const blocca = () => {
+        if (screen.orientation && screen.orientation.lock) return screen.orientation.lock('landscape');
+      };
+      const r = de.requestFullscreen ? de.requestFullscreen() : null;
+      // il blocco dell'orientamento funziona solo a schermo intero: si chiede dopo
+      if (r && r.then) r.then(blocca).catch(() => {});
+      else { const b = blocca(); if (b && b.catch) b.catch(() => {}); }
     } catch (e) { /* non supportato */ }
     S.stats = V.nuoveStats();
     avviaIntro();
@@ -269,6 +279,12 @@
   function rigioca() { S.stats = V.nuoveStats(); iniziaGiorno(1); }
 
   /* ---------- scorciatoie di test ---------- */
+  // in verticale la scorciatoia parte già in pausa: tornando in orizzontale c'è "Tocca per continuare"
+  function apriScorciatoia() {
+    const ok = scorciatoia();
+    if (ok && ruotato) sospendi();
+    return ok;
+  }
   function scorciatoia() {
     const h = location.hash.slice(1);
     const g = h.match(/^giorno([1-6])$/), f = h.match(/^falo([1-5])$/);
@@ -306,12 +322,13 @@
       if (verticale.addEventListener) verticale.addEventListener('change', controllaOrientamento);
       else if (verticale.addListener) verticale.addListener(controllaOrientamento);
     }
-    window.addEventListener('hashchange', scorciatoia);
+    window.addEventListener('hashchange', apriScorciatoia);
+    for (const el of [$('gioco'), document.body]) el.addEventListener('contextmenu', e => e.preventDefault());
 
     vetrina = V.creaMondo({ bioma: 'campi', durata: 1e6, diario: '-', eventi: [] }, 1);
     vetrina.ciclo = 0.3;   // pieno giorno dietro il titolo
     ridimensiona();
-    if (!scorciatoia()) vai('titolo');
+    if (!apriScorciatoia()) vai('titolo');
     V.caricaGrafica();
     requestAnimationFrame(frame);
   }

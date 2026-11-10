@@ -100,27 +100,51 @@
   }
 
   /* ---------- sfondi ---------- */
+  // profili periodici su P px: lo strato si disegna una volta in un canvas fuori schermo e si ripete
+  const P = 768, TAU = 2 * Math.PI / P;
   const PROFILI = {
-    onde: (x, s) => 14 + 7 * Math.sin(x * 0.021 + s) + 4 * Math.sin(x * 0.057 + s * 3),
-    filari: (x, s) => 9 + 3 * Math.sin(x * 0.03 + s) + (((x % 12) + 12) % 12 < 7 ? 4 : 0),
+    onde: (x, s) => 14 + 7 * Math.sin(3 * TAU * x + s) + 4 * Math.sin(7 * TAU * x + s * 3),
+    filari: (x, s) => 9 + 3 * Math.sin(3 * TAU * x + s) + (x % 12 < 7 ? 4 : 0),
     picchi: (x, s) => {
-      const p = 110, u = (((x + s * 50) % p) + p) % p / p;
-      return 16 + 48 * (1 - Math.abs(u * 2 - 1)) + 3 * Math.sin(x * 0.2);
+      const p = 128, u = ((x + s * 50) % p) / p;
+      return 16 + 48 * (1 - Math.abs(u * 2 - 1)) + 3 * Math.sin(24 * TAU * x);
     },
     alberi: (x, s) => {
       const p = 12, i = Math.floor(x / p), u = (x - i * p) / p;
       return 6 + (20 + hash(i + s * 1000) * 22) * (1 - Math.abs(u * 2 - 1));
     },
-    blocchi: (x, s) => 16 + Math.floor(hash(Math.floor(x / 26) + s * 1000) * 5) * 8
+    blocchi: (x, s) => 16 + Math.floor(hash(Math.floor(x / 32) + s * 1000) * 5) * 8
   };
 
+  const nuovaTela = (w, h) => {
+    if (typeof document !== 'undefined') { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+    return new OffscreenCanvas(w, h);
+  };
+  const cache = new Map();   // strati e cieli segnaposto già disegnati
+  function inCache(chiave, w, h, disegno) {
+    let c = cache.get(chiave);
+    if (!c) { c = nuovaTela(w, h); disegno(c.getContext('2d')); cache.set(chiave, c); }
+    return c;
+  }
+
   function strato(ctx, colore, forma, off, seme, scalaH, base) {
-    ctx.fillStyle = colore;
-    const f = PROFILI[forma] || PROFILI.onde;
-    for (let x = 0; x < V.W; x++) {
-      const h = R(f(x + off, seme) * scalaH);
-      ctx.fillRect(x, base - h, 1, V.SUOLO - base + h);
-    }
+    const tela = inCache(`strato|${colore}|${forma}|${seme}|${scalaH}|${base}`, P, V.SUOLO, c => {
+      c.fillStyle = colore;
+      const f = PROFILI[forma] || PROFILI.onde;
+      for (let x = 0; x < P; x++) {
+        const h = R(f(x, seme) * scalaH);
+        c.fillRect(x, base - h, 1, V.SUOLO - base + h);
+      }
+    });
+    tile(ctx, tela, off);
+  }
+
+  function cielo(ctx, chiave, alto, c0, c1) {
+    ctx.drawImage(inCache(`cielo|${chiave}|${alto}`, V.W, alto, c => {
+      const g = c.createLinearGradient(0, 0, 0, alto);
+      g.addColorStop(0, c0); g.addColorStop(1, c1);
+      c.fillStyle = g; c.fillRect(0, 0, V.W, alto);
+    }), 0, 0);
   }
 
   function tile(ctx, img, off) {
@@ -133,9 +157,7 @@
     const b = m.giorno.bioma, c = COLORI[b] || COLORI.campi, img = G.sfondi[b] || {};
     if (img.lontano) tile(ctx, img.lontano, m.dist * 0.2);
     else {
-      const g = ctx.createLinearGradient(0, 0, 0, V.SUOLO);
-      g.addColorStop(0, c.cielo[0]); g.addColorStop(1, c.cielo[1]);
-      ctx.fillStyle = g; ctx.fillRect(0, 0, V.W, V.SUOLO);
+      cielo(ctx, b, V.SUOLO, c.cielo[0], c.cielo[1]);
       strato(ctx, c.lontano, c.forme[0], R(m.dist * 0.2), 1, 1.8, V.SUOLO - 16);
     }
     if (img.medio) tile(ctx, img.medio, m.dist * 0.5);
@@ -173,7 +195,9 @@
   }
 
   /* ---------- entità ---------- */
-  const fulminiVisti = new WeakMap();   // fulmine -> frame di flash già disegnati
+  const fulminiVisti = new WeakMap();   // fulmine -> istante (ms) del primo disegno della saetta
+  const FLASH_MS = 33;
+  const larghezzeCartelli = new Map();  // testo -> larghezza in px a 6px
 
   function segnaposto(ctx, e, x, top) {
     ctx.fillStyle = COLORE_TIPO[e.tipo] || '#ccc';
@@ -184,8 +208,13 @@
 
   function cartello(ctx, e, x, base) {
     const s = e.ev.testo || '';
-    ctx.font = 'bold 6px monospace';
-    const tw = Math.ceil(ctx.measureText(s).width), bw = Math.max(16, tw + 6), cx = x + R(e.w / 2);
+    let tw = larghezzeCartelli.get(s);
+    if (tw === undefined) {
+      ctx.font = 'bold 6px monospace';
+      tw = Math.ceil(ctx.measureText(s).width);
+      larghezzeCartelli.set(s, tw);
+    }
+    const bw = Math.max(16, tw + 6), cx = x + R(e.w / 2);
     ctx.fillStyle = '#6a4a2a'; ctx.fillRect(cx - 1, base - 20, 2, 20);
     const bx = cx - R(bw / 2), by = base - 30;
     ctx.fillStyle = '#000'; ctx.fillRect(bx - 1, by - 1, bw + 2, 12);
@@ -352,13 +381,14 @@
     if (relax > 30 || Math.floor(t * 4) % 2) { ctx.fillStyle = colore; ctx.fillRect(34, 4, R(64 * relax / 100), 6); }
     ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(34, 4, R(64 * relax / 100), 1);
     testo(ctx, `Giorno ${n}`, V.W / 2, 3, '#fff', 'center');
-    const k = m.entita.filter(e => e.tipo === 'ricordo' && e.preso).length;
+    // ricordi del giorno: li conta engine.js (stato.ricordiGiorno), niente scansione delle entità a ogni frame
+    const k = stato.ricordiGiorno || 0;
     testo(ctx, `${k}/3`, V.W - 4, 3, '#ffe060', 'right');
     pix(ctx, V.W - 31, 4, ICONE.rombo, '#ffe060');
   }
 
   /* ---------- disegno principale ---------- */
-  // stato = { m, p, relax, stats, n, tempo, effetti?, hud? }
+  // stato = { m, p, relax, stats, n, tempo, ricordiGiorno?, effetti?, hud? }
   V.disegna = (ctx, stato) => {
     const { m, p } = stato, t = stato.tempo || 0;
     ctx.imageSmoothingEnabled = false;
@@ -385,11 +415,13 @@
 
     for (const e of fulmini) {
       saetta(ctx, e);
-      const visti = fulminiVisti.get(e) || 0;
-      if (visti < 2) { fulminiVisti.set(e, visti + 1); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, V.W, V.H); }
+      // flash bianco a tempo reale (~2 frame a 60 Hz), indipendente da quante volte si ridisegna
+      const ora = Date.now();
+      if (!fulminiVisti.has(e)) fulminiVisti.set(e, ora);
+      if (ora - fulminiVisti.get(e) < FLASH_MS) { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, V.W, V.H); }
     }
 
-    if (p && m.icona) fumetto(ctx, m, cx, top, t);
+    if (p && m.icona && p.anim !== 'stanca' && p.anim !== 'pisolino') fumetto(ctx, m, cx, top, t);
     for (const f of stato.effetti || []) {
       ctx.globalAlpha = Math.max(0, 1 - f.t / 0.9);
       testo(ctx, f.testo, f.x, f.y - f.t * 22, f.colore, 'center');
@@ -406,9 +438,7 @@
 
   const ILLUS = {
     intro(ctx, t) {
-      const g = ctx.createLinearGradient(0, 0, 0, 170);
-      g.addColorStop(0, '#f0a070'); g.addColorStop(1, '#ffe0b0');
-      ctx.fillStyle = g; ctx.fillRect(0, 0, V.W, V.H);
+      cielo(ctx, 'intro', 170, '#f0a070', '#ffe0b0');
       strato(ctx, '#b8a890', 'onde', 0, 4, 1.4, 168);
       ctx.fillStyle = '#7a6a4a'; ctx.fillRect(0, 168, V.W, V.H - 168);
       // le terme
@@ -434,9 +464,7 @@
       V.disegnaLei(ctx, 282, 168, { anim: 'cammina', i: Math.floor(t * 6) % 6 }, t);
     },
     falo(ctx, t) {
-      const g = ctx.createLinearGradient(0, 0, 0, 170);
-      g.addColorStop(0, '#0c1028'); g.addColorStop(1, '#2a3050');
-      ctx.fillStyle = g; ctx.fillRect(0, 0, V.W, V.H);
+      cielo(ctx, 'falo', 170, '#0c1028', '#2a3050');
       stelle(ctx, 50, 110);
       strato(ctx, '#161c30', 'alberi', 0, 9, 1.2, 168);
       ctx.fillStyle = '#20180f'; ctx.fillRect(0, 168, V.W, V.H - 168);
