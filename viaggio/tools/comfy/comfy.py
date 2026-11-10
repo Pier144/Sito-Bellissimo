@@ -5,6 +5,7 @@ Di default parla col server di test su 8189 (regola: mai la coda del Desktop su 
 import json
 import os
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
@@ -21,8 +22,11 @@ def _get(path):
 def _post(path, data):
     req = urllib.request.Request(BASE + path, data=json.dumps(data).encode(),
                                  headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        corpo = r.read()
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            corpo = r.read()
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"{path}: HTTP {e.code} {e.read().decode(errors='replace')[:3000]}") from None
     return json.loads(corpo) if corpo else None
 
 
