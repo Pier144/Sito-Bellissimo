@@ -229,7 +229,7 @@
     if (e.h >= 8) testo(ctx, (e.nome || '?')[0].toUpperCase(), x + e.w / 2, top + e.h / 2 - 4, '#fff', 'center');
   }
 
-  function cartello(ctx, e, x, base) {
+  function cartello(ctx, e, x, base, soloTavola = false) {
     const s = e.ev.testo || '';
     let tw = larghezzeCartelli.get(s);
     if (tw === undefined) {
@@ -238,7 +238,7 @@
       larghezzeCartelli.set(s, tw);
     }
     const bw = Math.max(16, tw + 6), cx = x + R(e.w / 2);
-    ctx.fillStyle = '#6a4a2a'; rect(ctx, cx - 1, base - 20, 2, 20);
+    if (!soloTavola) { ctx.fillStyle = '#6a4a2a'; rect(ctx, cx - 1, base - 20, 2, 20); }
     const bx = cx - R(bw / 2), by = base - 30;
     ctx.fillStyle = '#000'; rect(ctx, bx - 1, by - 1, bw + 2, 12);
     ctx.fillStyle = '#9a9a9a'; rect(ctx, bx, by, bw, 10);
@@ -266,6 +266,7 @@
           ctx.drawImage(s.img, -R(s.w / 2), -R(s.h / 2));
           ctx.restore();
         } else ctx.drawImage(s.img, R(cx - s.w / 2), by - s.h);
+        if (e.nome === 'cartello' && e.ev.testo) cartello(ctx, e, x, base, true);   // lo sprite è solo il palo
       } else if (e.nome === 'cartello') cartello(ctx, e, x, base);
       else segnaposto(ctx, e, x, base - R(e.h));
       if (e.stato === 'amico' && Math.floor(t * 2) % 2) pix(ctx, x + R(e.w / 2) - 3, base - R(e.h) - 8, ICONE.cuore, '#ff6a8a');
@@ -373,6 +374,7 @@
   }
   function moltiplica(ctx, rgb) {
     if (rgb[0] === 255 && rgb[1] === 255 && rgb[2] === 255) return;
+    rgb = rgb.map((v) => R(v + (255 - v) * 0.45));   // tinta morbida: con la grafica vera il colore pieno era troppo
     ctx.globalCompositeOperation = 'multiply';
     ctx.fillStyle = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
     rect(ctx, 0, 0, V.W, V.H);
