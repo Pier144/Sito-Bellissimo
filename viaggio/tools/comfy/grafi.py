@@ -62,8 +62,12 @@ def _pixel(g, nome, immagine, alt, larg, colori, scala_anteprima, rimuovi_sfondo
 
 
 def sprite(nome, prompt, seed, larghezza=1024, altezza=1024, lato_px=48, colori=24,
-           rimuovi_sfondo=True, immagine=None, denoise=1.0, prefisso=POS_SPRITE):
-    """Testo -> sprite (o, con `immagine`, immagine -> pixel in img2img)."""
+           rimuovi_sfondo=True, immagine=None, denoise=1.0, prefisso=POS_SPRITE, hd_trasparente=False):
+    """Testo -> sprite (o, con `immagine`, immagine -> pixel in img2img).
+
+    `hd_trasparente` (solo per genera.py, non nel workflow UI): la versione HD viene salvata già
+    scontornata, così pixelize.py può rifare il passaggio a pixel ritagliando il soggetto.
+    """
     g = Grafo()
     ckpt, lora, clip = _base_sdxl(g)
     pos = g.add("CLIPTextEncode", "Prompt", text=prefisso + prompt, clip=clip)
@@ -76,6 +80,11 @@ def sprite(nome, prompt, seed, larghezza=1024, altezza=1024, lato_px=48, colori=
     ks = g.add("KSampler", model=lora, seed=seed, steps=28, cfg=6.0, sampler_name="euler_ancestral",
                scheduler="normal", positive=pos, negative=neg, latent_image=lat, denoise=denoise)
     dec = g.add("VAEDecode", samples=ks, vae=ckpt.out(2))
+    if hd_trasparente and rimuovi_sfondo:
+        rb = g.add("LoadBackgroundRemovalModel", bg_removal_name=BIREFNET)
+        inv = g.add("InvertMask", mask=g.add("RemoveBackground", bg_removal_model=rb, image=dec))
+        dec = g.add("JoinImageWithAlpha", "Sfondo trasparente", image=dec, alpha=inv)
+        rimuovi_sfondo = False
     g.add("SaveImage", "Salva HD", images=dec, filename_prefix=f"Pixel Retro/{nome}_hd")
     _pixel(g, nome, dec, lato_px, 0, colori, 8, rimuovi_sfondo)
     return g.nodi
@@ -85,7 +94,8 @@ def img2img(nome, immagine, prompt, seed, denoise=0.55, **kw):
     return sprite(nome, prompt, seed, immagine=immagine, denoise=denoise, **kw)
 
 
-def sfondo(nome, prompt, seed, larghezza=1536, altezza=432, out=(768, 216), colori=32, rimuovi_sfondo=False):
+def sfondo(nome, prompt, seed, larghezza=1536, altezza=432, out=(768, 216), colori=32, rimuovi_sfondo=False,
+           hd_trasparente=False):
     g = Grafo()
     ckpt, lora, clip = _base_sdxl(g)
     pos = g.add("CLIPTextEncode", "Prompt", text=POS_SFONDO + prompt, clip=clip)
@@ -94,6 +104,11 @@ def sfondo(nome, prompt, seed, larghezza=1536, altezza=432, out=(768, 216), colo
     ks = g.add("KSampler", model=lora, seed=seed, steps=28, cfg=6.0, sampler_name="euler_ancestral",
                scheduler="normal", positive=pos, negative=neg, latent_image=lat, denoise=1.0)
     dec = g.add("VAEDecode", samples=ks, vae=ckpt.out(2))
+    if hd_trasparente and rimuovi_sfondo:
+        rb = g.add("LoadBackgroundRemovalModel", bg_removal_name=BIREFNET)
+        inv = g.add("InvertMask", mask=g.add("RemoveBackground", bg_removal_model=rb, image=dec))
+        dec = g.add("JoinImageWithAlpha", "Sfondo trasparente", image=dec, alpha=inv)
+        rimuovi_sfondo = False
     g.add("SaveImage", "Salva HD", images=dec, filename_prefix=f"Pixel Retro/{nome}_hd")
     _pixel(g, nome, dec, out[1], out[0], colori, 1, rimuovi_sfondo)
     return g.nodi

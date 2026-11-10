@@ -144,7 +144,11 @@ def _immagini(percorso):
 
 def _finisci(img, palette, con_contorno):
     img = applica_palette(img, palette)
-    return contorno(img) if con_contorno else img
+    if not con_contorno:
+        return img
+    largo = Image.new("RGBA", (img.width + 2, img.height + 2), (0, 0, 0, 0))
+    largo.alpha_composite(img, (1, 1))       # 1 px di margine, se no il contorno sui bordi sparisce
+    return contorno(largo)
 
 
 def main(argv=None):

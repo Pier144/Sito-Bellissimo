@@ -1,0 +1,69 @@
+{
+  "sprite": [
+    {"nome": "gallina", "prompt": "a plump white hen walking, red comb", "altezza": 16, "colori": 12},
+    {"nome": "pozzanghera", "prompt": "a small shallow muddy water puddle lying flat on the ground, side view", "altezza": 8, "colori": 10},
+    {"nome": "mucca", "prompt": "a black and white dairy cow lying down lazily on the ground, side view", "altezza": 28, "colori": 16},
+    {"nome": "trattore", "prompt": "a small red farm tractor, side view", "altezza": 30, "colori": 16},
+    {"nome": "cane", "prompt": "a friendly brown mutt dog standing, side view, tongue out", "altezza": 20, "colori": 12},
+    {"nome": "scoiattolo", "prompt": "a red squirrel holding a cookie, side view", "altezza": 14, "colori": 10},
+    {"nome": "radice", "prompt": "a twisted tree root sticking out of the ground, side view", "altezza": 10, "colori": 8},
+    {"nome": "fungo", "prompt": "a red mushroom with white dots", "altezza": 14, "colori": 8},
+    {"nome": "capra", "prompt": "a white mountain goat with curved horns standing, side view", "altezza": 24, "colori": 12},
+    {"nome": "sasso", "prompt": "a round grey boulder rock", "altezza": 16, "colori": 8},
+    {"nome": "cespuglio", "prompt": "a dry round tumbleweed bush", "altezza": 18, "colori": 10},
+    {"nome": "monopattino", "prompt": "an electric kick scooter parked, side view", "altezza": 22, "colori": 12},
+    {"nome": "piccione", "prompt": "a grey city pigeon flying, side view, wings spread", "altezza": 12, "colori": 10},
+    {"nome": "bus", "prompt": "an orange city bus, side view", "altezza": 32, "colori": 16},
+    {"nome": "snack", "prompt": "a small pack of chocolate chip cookies", "altezza": 12, "colori": 10},
+    {"nome": "grappolo", "prompt": "a bunch of purple grapes with a green leaf", "altezza": 14, "colori": 10},
+    {"nome": "panchina", "prompt": "a wooden park bench, side view", "altezza": 18, "colori": 10},
+    {"nome": "fonte", "prompt": "a small natural hot spring pool with steam rising, side view", "altezza": 16, "colori": 12},
+    {"nome": "ombrello", "prompt": "a closed red umbrella", "altezza": 16, "colori": 8},
+    {"nome": "paperella", "prompt": "a yellow rubber duck", "altezza": 12, "colori": 8},
+    {"nome": "cuffia", "prompt": "a blue swimming cap", "altezza": 12, "colori": 8},
+    {"nome": "accappatoio", "prompt": "a folded white fluffy bathrobe", "altezza": 14, "colori": 8},
+    {"nome": "ciabatta", "prompt": "a single white spa slipper", "altezza": 10, "colori": 8},
+    {"nome": "telo", "prompt": "a rolled up striped beach towel", "altezza": 12, "colori": 8},
+    {"nome": "braccialetto", "prompt": "a spa wristband with a locker key", "altezza": 10, "colori": 8},
+    {"nome": "cartello", "prompt": "a wooden road sign on a post, blank board", "altezza": 32, "colori": 10},
+    {"nome": "porta", "prompt": "the front door of a cozy house with a doormat and a potted plant", "altezza": 52, "colori": 16},
+    {"nome": "mano", "prompt": "an open hand icon, petting gesture", "altezza": 12, "colori": 6},
+    {"nome": "saetta", "prompt": "a jagged yellow lightning bolt", "altezza": 64, "colori": 6}
+  ],
+  "sfondi": {
+    "campi": {
+      "lontano": "distant rolling green hills under a bright blue sky with fluffy clouds, italian countryside",
+      "medio": "a row of poplar trees and a small farmhouse",
+      "vicino": "tall grass, wildflowers and a wooden fence"
+    },
+    "vigneti": {
+      "lontano": "vineyard hills under a warm golden afternoon sky, a distant village",
+      "medio": "rows of grapevines on a gentle slope and cypress trees",
+      "vicino": "grapevine poles and big vine leaves"
+    },
+    "bosco": {
+      "lontano": "deep forest silhouettes in soft mist, evening light through the trees",
+      "medio": "tall pine and oak trees",
+      "vicino": "ferns, bushes and small mushrooms"
+    },
+    "montagna": {
+      "lontano": "snowy alpine peaks under a clear cold sky",
+      "medio": "rocky mountain slopes with scattered pine trees",
+      "vicino": "grey rocks and small alpine flowers"
+    },
+    "temporale": {
+      "lontano": "dark stormy sky with heavy grey clouds over flat plains, rain",
+      "medio": "wind-bent trees in the rain",
+      "vicino": "wet tall grass bending in the wind"
+    },
+    "periferia": {
+      "lontano": "a city skyline at sunset with apartment blocks",
+      "medio": "small suburban houses with gardens and street lamps",
+      "vicino": "a trimmed hedge, a garden fence and a mailbox"
+    }
+  },
+  "strato_trasparente": "isolated on a plain white background, no sky, flat ground line at the bottom",
+  "altezza_sfondo_px": 216,
+  "larghezza_sfondo_px": 768,
+  "colori_sfondo": 32
+}
