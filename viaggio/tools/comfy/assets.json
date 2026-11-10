@@ -38,7 +38,7 @@
     },
     {
       "nome": "radice",
-      "prompt": "tree root, brown wooden root arching out of the ground, object focus",
+      "prompt": "fallen tree log, mossy wooden log lying on the ground, object focus",
       "altezza": 17,
       "colori": 14
     },
@@ -134,7 +134,7 @@
     },
     {
       "nome": "ciabatta",
-      "prompt": "flip-flop, single white flip flop sandal, object focus",
+      "prompt": "pair of flip-flops, white flip flop sandals seen from above, object focus",
       "altezza": 17,
       "colori": 14
     },
@@ -177,40 +177,36 @@
   ],
   "sfondi": {
     "campi": {
-      "lontano": "distant rolling green hills under a bright blue sky with fluffy clouds, italian countryside",
-      "medio": "a row of poplar trees and a small farmhouse",
-      "vicino": "tall grass, wildflowers and a wooden fence"
+      "seed": 11,
+      "prompt": "large blue sky with soft white clouds, distant small rolling green hills, tiny farmhouses and poplar trees far away, italian countryside, daytime"
     },
     "vigneti": {
-      "lontano": "vineyard hills under a warm golden afternoon sky, a distant village",
-      "medio": "rows of grapevines on a gentle slope and cypress trees",
-      "vicino": "grapevine poles and big vine leaves"
+      "seed": 11,
+      "prompt": "warm golden afternoon sky, distant gentle hills covered with vineyard rows, cypress trees, a small hilltop village far away, tuscany"
     },
     "bosco": {
-      "lontano": "deep forest silhouettes in soft mist, evening light through the trees",
-      "medio": "tall pine and oak trees",
-      "vicino": "ferns, bushes and small mushrooms"
+      "seed": 11,
+      "prompt": "forest edge, tall pine and oak trees in the distance, soft mist between the trees, light green canopy, sunbeams, evening light"
     },
     "montagna": {
-      "lontano": "snowy alpine peaks under a clear cold sky",
-      "medio": "rocky mountain slopes with scattered pine trees",
-      "vicino": "grey rocks and small alpine flowers"
+      "seed": 11,
+      "prompt": "clear cold sky, distant snowy alpine peaks, rocky slopes with scattered pine trees, alpine meadow far away"
     },
     "temporale": {
-      "lontano": "dark stormy sky with heavy grey clouds over flat plains, rain",
-      "medio": "wind-bent trees in the rain",
-      "vicino": "wet tall grass bending in the wind"
+      "seed": 11,
+      "prompt": "dark stormy sky with heavy grey clouds, rain, flat plains, wind-bent trees far away, gloomy"
     },
     "periferia": {
-      "lontano": "a city skyline at sunset with apartment blocks",
-      "medio": "small suburban houses with gardens and street lamps",
-      "vicino": "a trimmed hedge, a garden fence and a mailbox"
+      "seed": 11,
+      "prompt": "sunset sky, distant city skyline with apartment blocks, small suburban houses with gardens and street lamps far away"
     }
   },
-  "strato_trasparente": "isolated on a plain white background, no sky, flat ground line at the bottom",
   "altezza_sfondo_px": 360,
   "larghezza_sfondo_px": 1280,
-  "colori_sfondo": 48,
+  "colori_sfondo": 20,
   "banda_sfondo_px": 80,
-  "prefisso_sprite": "pixel art, sprite, no humans, single object, simple background, grey background, full body, side view, "
+  "prefisso_sprite": "pixel art, sprite, no humans, single object, simple background, grey background, full body, side view, ",
+  "prefisso_sfondo": "scenery, no humans, wide landscape, low horizon, pastel colors, simple shapes, flat colors, calm, ",
+  "pixel_sfondo": 2,
+  "foschia_sfondo": 0.25
 }

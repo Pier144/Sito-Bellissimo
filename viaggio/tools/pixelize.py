@@ -204,6 +204,8 @@ def main(argv=None):
     ap.add_argument("--banda", type=int, default=48)
     ap.add_argument("--contorno", action="store_true")
     ap.add_argument("--palette-da", help="riusa la palette di questa immagine (sfondi dello stesso bioma)")
+    ap.add_argument("--pixel", type=int, default=1, help="sfondo: dimensione del pixel (2 = mezza risoluzione)")
+    ap.add_argument("--foschia", type=float, default=0.0, help="sfondo: 0-1, schiarisce verso il colore del cielo")
     ap.add_argument("--riferimento", help="sheet: la scala comune si calcola solo su questa animazione (es. cammina)")
     ap.add_argument("--altezze", default="", help="sheet: altezza del fotogramma più alto per animazione, "
                     "es. 'stanca=62,pisolino=24' (pose generate con inquadrature diverse)")
@@ -232,11 +234,20 @@ def main(argv=None):
         print(json.dumps(meta))
     else:
         img = _immagini(a.ingresso)[0].convert("RGBA")
-        img = img.resize((a.larghezza + a.banda, a.altezza), Image.BOX)
-        img = ripetibile(img, a.banda)
-        img = soglia_alpha(img)
+        k = a.pixel
+        img = img.resize(((a.larghezza + a.banda) // k, a.altezza // k), Image.BOX)
+        img = soglia_alpha(ripetibile(img, a.banda // k))
+        if a.foschia:   # prospettiva aerea: tutto un po' verso il colore del cielo (media delle righe in alto)
+            cielo = img.crop((0, 0, img.width, max(1, img.height // 12))).resize((1, 1), Image.BOX).getpixel((0, 0))
+            velo = Image.new("RGBA", img.size, (*cielo[:3], 255))
+            alfa = img.getchannel("A")
+            img = Image.blend(img, velo, a.foschia)
+            img.putalpha(alfa)
         pal = estrai_palette([Image.open(a.palette_da)] if a.palette_da else [img], a.colori)
-        applica_palette(img, pal).save(out)
+        img = applica_palette(img, pal)
+        if k > 1:
+            img = img.resize((img.width * k, img.height * k), Image.NEAREST)
+        img.save(out)
         print(json.dumps({"file": out.name, "w": a.larghezza, "h": a.altezza}))
 
 

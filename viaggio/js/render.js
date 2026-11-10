@@ -184,7 +184,7 @@
       strato(ctx, c.lontano, c.forme[0], m.dist * 0.2, 1, 1.8, V.SUOLO - 16);
     }
     if (img.medio) tile(ctx, img.medio, m.dist * 0.5 * K);
-    else strato(ctx, c.medio, c.forme[1], m.dist * 0.5, 2, 1.1, V.SUOLO);
+    else if (!img.lontano) strato(ctx, c.medio, c.forme[1], m.dist * 0.5, 2, 1.1, V.SUOLO);   // lo sfondo vero è una scena intera
     if (img.vicino) tile(ctx, img.vicino, m.dist * K);
     else terreno(ctx, m, c);
   }

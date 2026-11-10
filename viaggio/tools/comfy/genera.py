@@ -55,25 +55,16 @@ def genera_sprite(voce, seed, prefisso=grafi.POS_SPRITE):
     print(nome, meta)
 
 
-def genera_sfondo(bioma, strati, conf, seed):
-    larg, alt, colori = conf["larghezza_sfondo_px"], conf["altezza_sfondo_px"], conf["colori_sfondo"]
-    file = {}
-    for strato in ("lontano", "medio", "vicino"):
-        trasparente = strato != "lontano"
-        prompt = strati[strato] + (", " + conf["strato_trasparente"] if trasparente else "")
-        nome = f"{bioma}_{strato}"
-        hd = _hd(grafi.sfondo(nome, prompt, seed, out=(larg, alt), colori=colori, rimuovi_sfondo=trasparente,
-                              hd_trasparente=trasparente),
-                 RAW / "sfondi" / nome)
-        out = ASSETS / "bg" / f"{nome}.png"
-        args = ["sfondo", "--in", hd, "--out", out, "--larghezza", larg, "--altezza", alt, "--colori", colori,
-                "--banda", conf["banda_sfondo_px"]]
-        if trasparente:
-            args += ["--palette-da", ASSETS / "bg" / f"{bioma}_lontano.png"]
-        pixelize(*args)
-        file[strato] = f"bg/{nome}.png"
-        print(nome)
-    aggiorna_manifest("sfondi", bioma, file)
+def genera_sfondo(bioma, voce, conf, seed=None):
+    """Uno strato per bioma: scena intera, mezza risoluzione, foschia (terreno e primo piano li disegna il gioco)."""
+    nome = f"{bioma}_lontano"
+    hd = _hd(grafi.sfondo(nome, voce["prompt"], seed or voce.get("seed", 1)), RAW / "sfondi" / nome)
+    out = ASSETS / "bg" / f"{nome}.png"
+    pixelize("sfondo", "--in", hd, "--out", out, "--larghezza", conf["larghezza_sfondo_px"],
+             "--altezza", conf["altezza_sfondo_px"], "--colori", conf["colori_sfondo"],
+             "--banda", conf["banda_sfondo_px"], "--pixel", conf["pixel_sfondo"], "--foschia", conf["foschia_sfondo"])
+    aggiorna_manifest("sfondi", bioma, {"lontano": f"bg/{nome}.png"})
+    print(nome)
 
 
 def contact():
@@ -109,9 +100,10 @@ def main():
             if not solo or voce["nome"] in solo:
                 genera_sprite(voce, a.seed, conf.get("prefisso_sprite", grafi.POS_SPRITE))
     elif a.tipo == "sfondi":
-        for bioma, strati in conf["sfondi"].items():
+        for bioma, voce in conf["sfondi"].items():
             if not solo or bioma in solo:
-                genera_sfondo(bioma, strati, conf, a.seed)
+                genera_sfondo(bioma, dict(voce, prompt=conf["prefisso_sfondo"] + voce["prompt"]), conf,
+                              a.seed if a.seed != 1 else None)
     else:
         contact()
 
