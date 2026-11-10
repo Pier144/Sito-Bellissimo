@@ -2,175 +2,175 @@
   "sprite": [
     {
       "nome": "gallina",
-      "prompt": "a plump white hen walking, red comb",
+      "prompt": "chicken, hen, bird, brown feathers, red comb, beak, standing, animal focus",
       "altezza": 27,
       "colori": 18
     },
     {
       "nome": "pozzanghera",
-      "prompt": "a small shallow muddy water puddle lying flat on the ground, side view",
+      "prompt": "puddle, muddy water puddle on the ground, flat, object focus",
       "altezza": 13,
       "colori": 16
     },
     {
       "nome": "mucca",
-      "prompt": "a black and white dairy cow lying down lazily on the ground, side view",
+      "prompt": "cow, holstein cow, black and white spots, lying down on the ground, resting, animal focus",
       "altezza": 47,
       "colori": 22
     },
     {
       "nome": "trattore",
-      "prompt": "a small red farm tractor, side view",
+      "prompt": "red tractor, farm vehicle, big rear wheels, vehicle focus",
       "altezza": 50,
       "colori": 22
     },
     {
       "nome": "cane",
-      "prompt": "a friendly brown mutt dog standing, side view, tongue out",
+      "prompt": "dog, brown mutt dog, tongue out, happy, standing, animal focus",
       "altezza": 33,
       "colori": 18
     },
     {
       "nome": "scoiattolo",
-      "prompt": "a red squirrel holding a cookie, side view",
+      "prompt": "squirrel, red squirrel, bushy tail, holding a cookie, animal focus",
       "altezza": 23,
       "colori": 16
     },
     {
       "nome": "radice",
-      "prompt": "a twisted tree root sticking out of the ground, side view",
+      "prompt": "tree root, gnarled wooden root sticking out of the dirt, object focus",
       "altezza": 17,
       "colori": 14
     },
     {
       "nome": "fungo",
-      "prompt": "a red mushroom with white dots",
+      "prompt": "mushroom, red cap with white spots, amanita, object focus",
       "altezza": 23,
       "colori": 14
     },
     {
       "nome": "capra",
-      "prompt": "a white mountain goat with curved horns standing, side view",
+      "prompt": "goat, white mountain goat, curved horns, beard, standing, animal focus",
       "altezza": 40,
       "colori": 18
     },
     {
       "nome": "sasso",
-      "prompt": "a round grey boulder rock",
+      "prompt": "rock, round grey boulder, stone, object focus",
       "altezza": 27,
       "colori": 14
     },
     {
       "nome": "cespuglio",
-      "prompt": "a dry round tumbleweed bush",
+      "prompt": "tumbleweed, round dry brown bush, object focus",
       "altezza": 30,
       "colori": 16
     },
     {
       "nome": "monopattino",
-      "prompt": "an electric kick scooter parked, side view",
+      "prompt": "electric kick scooter, vehicle focus",
       "altezza": 37,
       "colori": 18
     },
     {
       "nome": "piccione",
-      "prompt": "a grey city pigeon flying, side view, wings spread",
+      "prompt": "pigeon, grey bird, flying, spread wings, animal focus",
       "altezza": 20,
       "colori": 16
     },
     {
       "nome": "bus",
-      "prompt": "an orange city bus, side view",
+      "prompt": "bus, orange city bus, windows, wheels, vehicle focus",
       "altezza": 53,
       "colori": 22
     },
     {
       "nome": "snack",
-      "prompt": "a small pack of chocolate chip cookies",
+      "prompt": "cookie package, bag of chocolate chip cookies, snack, food focus",
       "altezza": 20,
       "colori": 16
     },
     {
       "nome": "grappolo",
-      "prompt": "a bunch of purple grapes with a green leaf",
+      "prompt": "grapes, bunch of purple grapes, green leaf, food focus",
       "altezza": 23,
       "colori": 16
     },
     {
       "nome": "panchina",
-      "prompt": "a wooden park bench, side view",
+      "prompt": "park bench, wooden bench, object focus",
       "altezza": 30,
       "colori": 16
     },
     {
       "nome": "fonte",
-      "prompt": "a small natural hot spring pool with steam rising, side view",
+      "prompt": "hot spring, small natural pool, steam rising, rocks around it, water",
       "altezza": 27,
       "colori": 18
     },
     {
       "nome": "ombrello",
-      "prompt": "a closed red umbrella",
+      "prompt": "umbrella, closed red umbrella, object focus",
       "altezza": 27,
       "colori": 14
     },
     {
       "nome": "paperella",
-      "prompt": "a yellow rubber duck",
+      "prompt": "rubber duck, yellow rubber duck toy, object focus",
       "altezza": 20,
       "colori": 14
     },
     {
       "nome": "cuffia",
-      "prompt": "a blue swimming cap",
+      "prompt": "swim cap, blue swimming cap, object focus",
       "altezza": 20,
       "colori": 14
     },
     {
       "nome": "accappatoio",
-      "prompt": "a folded white fluffy bathrobe",
+      "prompt": "white bathrobe hanging on a wooden clothes hanger, no humans, object focus",
       "altezza": 23,
       "colori": 14
     },
     {
       "nome": "ciabatta",
-      "prompt": "a single white spa slipper",
+      "prompt": "slipper, white spa slipper, object focus",
       "altezza": 17,
       "colori": 14
     },
     {
       "nome": "telo",
-      "prompt": "a rolled up striped beach towel",
+      "prompt": "towel, rolled up striped towel, object focus",
       "altezza": 20,
       "colori": 14
     },
     {
       "nome": "braccialetto",
-      "prompt": "a spa wristband with a locker key",
+      "prompt": "wristband, rubber spa wristband with a locker key, object focus",
       "altezza": 17,
       "colori": 14
     },
     {
       "nome": "cartello",
-      "prompt": "a wooden road sign on a post, blank board",
+      "prompt": "wooden sign, blank wooden board on a post, signpost, object focus",
       "altezza": 53,
       "colori": 16
     },
     {
       "nome": "porta",
-      "prompt": "the front door of a cozy house with a doormat and a potted plant",
+      "prompt": "front door, wooden house door, door frame, doormat, potted plant",
       "altezza": 87,
       "colori": 22
     },
     {
       "nome": "mano",
-      "prompt": "an open hand icon, petting gesture",
+      "prompt": "hand, open palm, icon",
       "altezza": 20,
       "colori": 12
     },
     {
       "nome": "saetta",
-      "prompt": "a jagged yellow lightning bolt",
+      "prompt": "lightning bolt, yellow lightning, icon",
       "altezza": 107,
       "colori": 12
     }
@@ -211,5 +211,6 @@
   "altezza_sfondo_px": 360,
   "larghezza_sfondo_px": 1280,
   "colori_sfondo": 48,
-  "banda_sfondo_px": 80
+  "banda_sfondo_px": 80,
+  "prefisso_sprite": "pixel art, sprite, no humans, single object, simple background, grey background, full body, side view, "
 }

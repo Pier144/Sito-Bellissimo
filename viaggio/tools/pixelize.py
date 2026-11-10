@@ -50,6 +50,38 @@ def pixellizza(img, altezza=None, dimensioni=None, scala=None):
     return soglia_alpha(img.resize(misura, Image.BOX), 110)
 
 
+def solo_principale(img, frazione=0.15):
+    """Toglie i pezzetti staccati (componenti opache < frazione della più grande) e ritaglia."""
+    img = img.convert("RGBA")
+    w, h = img.size
+    a = img.getchannel("A").load()
+    visti, comp = set(), []
+    for y in range(h):
+        for x in range(w):
+            if a[x, y] and (x, y) not in visti:
+                pila, pezzo = [(x, y)], []
+                visti.add((x, y))
+                while pila:
+                    cx, cy = pila.pop()
+                    pezzo.append((cx, cy))
+                    for nx in (cx - 1, cx, cx + 1):
+                        for ny in (cy - 1, cy, cy + 1):
+                            if 0 <= nx < w and 0 <= ny < h and a[nx, ny] and (nx, ny) not in visti:
+                                visti.add((nx, ny))
+                                pila.append((nx, ny))
+                comp.append(pezzo)
+    if len(comp) <= 1:
+        return img
+    grande = max(len(c) for c in comp)
+    px = img.load()
+    for c in comp:
+        if len(c) < grande * frazione:
+            for x, y in c:
+                px[x, y] = (0, 0, 0, 0)
+    box = img.getchannel("A").getbbox()
+    return img.crop(box) if box else img
+
+
 def scala_comune(immagini, altezza):
     """Fattore unico: il fotogramma più alto (contenuto opaco) diventa alto `altezza`."""
     alte = [soglia_alpha(i.convert("RGBA")).getchannel("A").getbbox() for i in immagini]
@@ -180,7 +212,7 @@ def main(argv=None):
     out.parent.mkdir(parents=True, exist_ok=True)
 
     if a.modo == "sprite":
-        imgs = [pixellizza(i, a.altezza) for i in _immagini(a.ingresso)]
+        imgs = [solo_principale(pixellizza(i, a.altezza)) for i in _immagini(a.ingresso)]
         pal = estrai_palette(imgs, a.colori)
         _finisci(imgs[0], pal, a.contorno).save(out)
         print(json.dumps({"file": out.name, "w": imgs[0].width + 2 * a.contorno, "h": imgs[0].height + 2 * a.contorno}))

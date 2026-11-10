@@ -30,6 +30,11 @@ class T(unittest.TestCase):
         self.assertEqual(px.pixellizza(alto, scala=f).height, 40)
         self.assertEqual(px.pixellizza(basso, scala=f).height, 30)   # non riscalato a 40
 
+    def test_solo_principale(self):
+        im = Image.new("RGBA", (20, 10)); im.paste((255, 0, 0, 255), (8, 0, 20, 10)); im.putpixel((0, 9), (0, 0, 255, 255))
+        out = px.solo_principale(im)
+        self.assertEqual(out.size, (12, 10))      # il pixel isolato sparisce e si ritaglia
+
     def test_palette_comune(self):
         a = Image.new("RGBA", (4, 4), (250, 10, 10, 255)); b = Image.new("RGBA", (4, 4), (10, 10, 250, 255))
         pal = px.estrai_palette([a, b], 2)

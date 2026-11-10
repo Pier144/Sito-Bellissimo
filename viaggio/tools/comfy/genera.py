@@ -44,10 +44,10 @@ def _hd(grafo, cartella):
     return file
 
 
-def genera_sprite(voce, seed):
+def genera_sprite(voce, seed, prefisso=grafi.POS_SPRITE):
     nome = voce["nome"]
     hd = _hd(grafi.sprite(nome, voce["prompt"], seed, lato_px=voce["altezza"] * 4, colori=voce["colori"],
-                          hd_trasparente=True), RAW / "sprite" / nome)
+                          hd_trasparente=True, prefisso=prefisso), RAW / "sprite" / nome)
     out = ASSETS / "sprites" / f"{nome}.png"
     meta = pixelize("sprite", "--in", hd, "--out", out, "--altezza", voce["altezza"],
                     "--colori", voce["colori"], "--contorno")
@@ -107,7 +107,7 @@ def main():
     if a.tipo == "sprite":
         for voce in conf["sprite"]:
             if not solo or voce["nome"] in solo:
-                genera_sprite(voce, a.seed)
+                genera_sprite(voce, a.seed, conf.get("prefisso_sprite", grafi.POS_SPRITE))
     elif a.tipo == "sfondi":
         for bioma, strati in conf["sfondi"].items():
             if not solo or bioma in solo:
