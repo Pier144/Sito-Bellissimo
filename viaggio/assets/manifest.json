@@ -197,5 +197,9 @@
       "lontano": "bg/periferia_lontano.png"
     }
   },
-  "illustrazioni": {}
+  "illustrazioni": {
+    "intro": "illustrazioni/intro.png",
+    "falo": "illustrazioni/falo.png",
+    "divano": "illustrazioni/divano.png"
+  }
 }
