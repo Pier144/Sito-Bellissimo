@@ -31,12 +31,13 @@ def soglia_alpha(img, soglia=128):
     return img
 
 
-def pixellizza(img, altezza=None, dimensioni=None):
+def pixellizza(img, altezza=None, dimensioni=None, scala=None):
     """Ritaglia al contenuto opaco e riduce con BOX (media di ogni blocco), poi alpha netta.
 
     BOX invece di NEAREST: con riduzioni forti (~13-25x) NEAREST prende un pixel a caso per blocco e
     il viso si riempie di rumore; la media tiene occhi e righe leggibili (provato il 2026-11-10).
-    Con `altezza` mantiene le proporzioni; con `dimensioni=(w, h)` forza la misura (sfondi).
+    Con `altezza` mantiene le proporzioni; con `dimensioni=(w, h)` forza la misura (sfondi);
+    con `scala` usa un fattore fisso (fotogrammi di un'animazione: tutti alla stessa scala).
     """
     img = img.convert("RGBA")
     if dimensioni:
@@ -44,8 +45,15 @@ def pixellizza(img, altezza=None, dimensioni=None):
     box = soglia_alpha(img).getchannel("A").getbbox()
     if box:
         img = img.crop(box)
-    larghezza = max(1, round(img.width * altezza / img.height))
-    return soglia_alpha(img.resize((larghezza, altezza), Image.BOX), 110)
+    f = scala if scala else altezza / img.height
+    misura = (max(1, round(img.width * f)), max(1, round(img.height * f)))
+    return soglia_alpha(img.resize(misura, Image.BOX), 110)
+
+
+def scala_comune(immagini, altezza):
+    """Fattore unico: il fotogramma più alto (contenuto opaco) diventa alto `altezza`."""
+    alte = [soglia_alpha(i.convert("RGBA")).getchannel("A").getbbox() for i in immagini]
+    return altezza / max(b[3] - b[1] for b in alte if b)
 
 
 def _pixel_opachi(immagini):
@@ -164,6 +172,7 @@ def main(argv=None):
     ap.add_argument("--banda", type=int, default=48)
     ap.add_argument("--contorno", action="store_true")
     ap.add_argument("--palette-da", help="riusa la palette di questa immagine (sfondi dello stesso bioma)")
+    ap.add_argument("--riferimento", help="sheet: la scala comune si calcola solo su questa animazione (es. cammina)")
     a = ap.parse_args(argv)
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -175,7 +184,10 @@ def main(argv=None):
         print(json.dumps({"file": out.name, "w": imgs[0].width + 2 * a.contorno, "h": imgs[0].height + 2 * a.contorno}))
     elif a.modo == "sheet":
         cartelle = sorted(d for d in Path(a.ingresso).iterdir() if d.is_dir())
-        righe = {d.name: [pixellizza(i, a.altezza) for i in _immagini(d)] for d in cartelle}
+        sorgenti = {d.name: _immagini(d) for d in cartelle}
+        base = sorgenti[a.riferimento] if a.riferimento else [i for l in sorgenti.values() for i in l]
+        f = scala_comune(base, a.altezza)   # una scala per tutti: niente "pulsazioni" tra i fotogrammi
+        righe = {k: [pixellizza(i, scala=f) for i in l] for k, l in sorgenti.items()}
         pal = estrai_palette([f for l in righe.values() for f in l], a.colori)
         righe = {k: [_finisci(f, pal, a.contorno) for f in l] for k, l in righe.items()}
         sheet, meta = monta_sheet(righe)

@@ -2,6 +2,7 @@
 
   python personaggio.py sheet --seed 1 --quanti 4
   python personaggio.py posa --base FILE --nome salto_1 --seed 1 --prompt "..."
+  python personaggio.py pose --base FILE --seed 1 [--nome salto,bacino]
   python personaggio.py cammina --base FILE --seed 1
   python personaggio.py pulisci --cartella DIR
   python personaggio.py ripassa --cartella DIR --nome cammina [--prompt "walking pose"]
@@ -30,6 +31,24 @@ RIPASSO = ("girl with long very dark brown curly hair in a ponytail, small hoop 
 RIPASSO_DENOISE = 0.25
 RIPASSO_SEED = 7
 
+POSA_BASE = ("Same girl, same face, same hairstyle, same outfit and same art style as the reference image, "
+             "full body, plain white background. ")
+POSE = {
+    "salto": ["Side view facing right. She is jumping up in mid-air: knees bent and tucked, arms raised up, happy.",
+              "Side view facing right. She is coming down from a jump in mid-air: legs stretched down, arms up."],
+    "colpita": ["Side view facing right. She just bumped into something: leaning backwards, arms flailing, "
+                "eyes squeezed shut, surprised."],
+    "stanca": ["Side view facing right. She sits on the ground exhausted, legs stretched forward, leaning back on "
+               "her hands, puffing her cheeks, tired face.",
+               "Side view facing right. She sits on the ground exhausted, legs stretched forward, leaning back on "
+               "her hands, blowing out air with a sigh, eyes half closed."],
+    "pisolino": ["She is lying on her side on the ground taking a nap, eyes closed, peaceful smile, seen from the side.",
+                 "She is lying on her side on the ground sleeping deeply, eyes closed, mouth slightly open, "
+                 "seen from the side."],
+    "bacino": ["She faces the viewer, making a duck-face kiss with pursed lips, one hand on her hip.",
+               "She faces the viewer, making a duck-face kiss with pursed lips and winking one eye, one hand on her hip."],
+}
+
 CAMMINA = ("the girl walks in place to the right, side view, steady camera, plain white background, "
            "looping walk cycle")
 
@@ -43,7 +62,7 @@ def _genera(grafo, cartella):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("modo", choices=["sheet", "posa", "cammina", "pulisci", "ripassa"])
+    ap.add_argument("modo", choices=["sheet", "posa", "pose", "cammina", "pulisci", "ripassa"])
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--quanti", type=int, default=4)
     ap.add_argument("--base")
@@ -59,6 +78,16 @@ def main():
     elif a.modo == "posa":
         base = comfy.carica(a.base)
         print(_genera(grafi.qwen_edit(a.nome, [base], a.prompt, a.seed), RAW / "pose"))
+    elif a.modo == "pose":
+        # tutte le pose di POSE dalla base -> _raw/pose/<anim>/<n>.png (--solo per rifarne alcune)
+        base = comfy.carica(a.base)
+        for anim, testi in POSE.items():
+            if a.nome and anim not in a.nome.split(","):
+                continue
+            for n, testo in enumerate(testi, 1):
+                f = _genera(grafi.qwen_edit(f"posa_{anim}_{n}", [base], POSA_BASE + testo, a.seed), RAW / "pose" / anim)[0]
+                f.replace(f.with_name(f"{n}.png"))
+                print(anim, n)
     elif a.modo == "cammina":
         base = comfy.carica(a.base)
         print(_genera(grafi.wan_cammina("lei", base, CAMMINA, a.seed, larghezza=480, altezza=720), RAW / "cammina"))

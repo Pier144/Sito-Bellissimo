@@ -35,7 +35,7 @@
 
   V.posa = (p, anim, durata) => { p.anim = anim; p.tStato = durata; p.tAnim = 0; };
 
-  const FPS = { cammina: 10, stanca: 2, pisolino: 2, bacino: 3, colpita: 1 };
+  const FPS = { cammina: 12, stanca: 2, pisolino: 2, bacino: 3, colpita: 1 };
   V.frameGiocatrice = p => {
     if (!p.aTerra) return { anim: 'salto', i: p.vy > 0 ? 0 : 1 };
     return { anim: p.anim, i: Math.floor(p.tAnim * FPS[p.anim]) % V.FRAMES[p.anim] };

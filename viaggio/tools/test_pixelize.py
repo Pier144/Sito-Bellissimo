@@ -23,6 +23,13 @@ class T(unittest.TestCase):
         r, g, b, a = out.getpixel((3, 3))
         self.assertTrue(100 < r < 160 and 100 < b < 160, (r, g, b))
 
+    def test_scala_comune_fotogrammi(self):
+        alto = Image.new("RGBA", (100, 200)); alto.paste((255, 0, 0, 255), (0, 0, 100, 200))
+        basso = Image.new("RGBA", (100, 200)); basso.paste((255, 0, 0, 255), (0, 50, 100, 200))
+        f = px.scala_comune([alto, basso], 40)
+        self.assertEqual(px.pixellizza(alto, scala=f).height, 40)
+        self.assertEqual(px.pixellizza(basso, scala=f).height, 30)   # non riscalato a 40
+
     def test_palette_comune(self):
         a = Image.new("RGBA", (4, 4), (250, 10, 10, 255)); b = Image.new("RGBA", (4, 4), (10, 10, 250, 255))
         pal = px.estrai_palette([a, b], 2)

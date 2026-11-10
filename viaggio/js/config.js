@@ -10,7 +10,7 @@
   V.FANGO = 0.6;                       // moltiplicatore velocità sul fango
   V.OMBRELLO = 8;                      // secondi di immunità ai fulmini
   V.FINESTRA_AZIONE = 150;             // px davanti a lei in cui l'azione è possibile (~1.5 s)
-  V.FRAMES = { cammina: 6, salto: 2, colpita: 1, stanca: 2, pisolino: 2, bacino: 2 };
+  V.FRAMES = { cammina: 8, salto: 2, colpita: 1, stanca: 2, pisolino: 2, bacino: 2 };
   V.ENTITA = {                         // hitbox; y = altezza da terra del bordo inferiore
     gallina: { w: 14, h: 14 }, pozzanghera: { w: 24, h: 4 }, mucca: { w: 36, h: 22 },
     trattore: { w: 40, h: 24 }, cane: { w: 20, h: 16 }, scoiattolo: { w: 12, h: 12 },

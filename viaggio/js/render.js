@@ -486,7 +486,7 @@
       ctx.fillStyle = '#000'; rect(ctx, 301, 127, 42, 14);
       ctx.fillStyle = '#9a7a4a'; rect(ctx, 302, 128, 40, 12);
       testo(ctx, 'Casa →', 322, 130, '#fff', 'center');
-      V.disegnaLei(ctx, 282, 168, { anim: 'cammina', i: Math.floor(t * 6) % 6 }, t);
+      V.disegnaLei(ctx, 282, 168, { anim: 'cammina', i: Math.floor(t * 12) % V.FRAMES.cammina }, t);
     },
     falo(ctx, t) {
       cielo(ctx, 'falo', 170, '#0c1028', '#2a3050');

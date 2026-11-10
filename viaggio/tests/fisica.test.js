@@ -34,6 +34,6 @@ test('durante il pisolino non salta', () => {
   assert.strictEqual(V.premiSalto(p), false);
 });
 test('frame della camminata ciclico', () => {
-  const p = V.creaGiocatrice(); p.tAnim = 0.65;
+  const p = V.creaGiocatrice(); p.tAnim = 0.7;   // 0.7 s * 12 fps = 8.4 -> fotogramma 0 di 8
   assert.deepStrictEqual(V.frameGiocatrice(p), { anim: 'cammina', i: 0 });
 });
