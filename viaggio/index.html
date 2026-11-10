@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Un viaggio inaspettato</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000000">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
+  body {
+    color: #fff;
+    font: bold 16px/1.3 ui-monospace, Consolas, "Courier New", monospace;
+    text-shadow: 2px 2px 0 #000;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+  }
+  button { font: inherit; color: inherit; text-shadow: inherit; }
+
+  /* scena: canvas logico 384x216 scalato da engine.js (--s = scala) */
+  #scena { position: absolute; left: 0; top: 0; width: 384px; height: 216px; --s: 1; overflow: hidden; }
+  #gioco, canvas.illus, canvas.lei {
+    display: block;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+  }
+  #gioco { width: 100%; height: 100%; }
+
+  .schermo {
+    position: absolute; inset: 0; display: none; isolation: isolate;
+    flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    font-size: calc(var(--s) * 8px);
+    padding: calc(var(--s) * 8px);
+  }
+  .schermo.on { display: flex; }
+  .schermo p { margin: 0; }
+  canvas.illus { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+  canvas.lei { width: calc(var(--s) * 40px); height: calc(var(--s) * 56px); }
+
+  h1, h2 { margin: 0; line-height: 1.05; letter-spacing: .04em; }
+  h1 { font-size: 2.6em; color: #ffe08a; text-shadow: 3px 3px 0 #7a2f1c, 5px 5px 0 #000; }
+  h2 { font-size: 1.8em; color: #ffe08a; text-shadow: 3px 3px 0 #7a2f1c, 5px 5px 0 #000; }
+
+  .bottoni { display: flex; gap: calc(var(--s) * 6px); align-items: center; margin-top: calc(var(--s) * 4px); }
+  .schermo button {
+    font-size: 1.3em; padding: .25em .9em; cursor: pointer;
+    background: #d0583a; border: calc(var(--s) * 2px) solid #000; border-radius: 0;
+    box-shadow: inset 0 calc(var(--s) * -3px) 0 rgba(0,0,0,.35), calc(var(--s) * 2px) calc(var(--s) * 2px) 0 #000;
+  }
+  .schermo button:active { transform: translate(calc(var(--s) * 1px), calc(var(--s) * 1px)); }
+  .schermo button.piccolo { font-size: 1em; background: #3a5a8a; }
+
+  #titolo { background: linear-gradient(rgba(0,0,0,.15), rgba(0,0,0,.55)); gap: calc(var(--s) * 3px); }
+
+  .riquadro {
+    width: 92%; min-height: 3.2em; padding: .5em .8em; text-align: left; font-size: 1.15em;
+    background: rgba(10,10,30,.78); border: calc(var(--s) * 2px) solid #fff; box-shadow: calc(var(--s) * 2px) calc(var(--s) * 2px) 0 #000;
+  }
+  #intro, #falo { justify-content: flex-end; gap: calc(var(--s) * 3px); }
+  .nota { font-size: .9em; opacity: .85; }
+  #faloNota { visibility: hidden; }
+  #faloNota.vis { visibility: visible; animation: pulsa 1s steps(2) infinite; }
+  @keyframes pulsa { 50% { opacity: .3; } }
+
+  #stanca, #pausa { background: rgba(0,0,0,.45); gap: calc(var(--s) * 4px); }
+  .grande { font-size: 2.2em; color: #ffe08a; }
+  #pausa .nota { animation: pulsa 1s steps(2) infinite; }
+
+  #finale { justify-content: center; }
+  .pannello {
+    display: flex; flex-direction: column; align-items: center; gap: calc(var(--s) * 3px);
+    padding: calc(var(--s) * 6px) calc(var(--s) * 10px);
+    background: rgba(10,10,30,.55); border: calc(var(--s) * 2px) solid #fff; box-shadow: calc(var(--s) * 2px) calc(var(--s) * 2px) 0 #000;
+  }
+  .riga { display: flex; align-items: center; gap: calc(var(--s) * 8px); }
+  #riepilogo { list-style: none; margin: 0; padding: 0; text-align: left; font-size: 1.1em; }
+  #frase { max-width: calc(var(--s) * 300px); color: #ffd6e8; }
+
+  #ruota {
+    position: fixed; inset: 0; z-index: 10; display: none; background: #000;
+    flex-direction: column; align-items: center; justify-content: center; gap: 28px; font-size: 22px; text-align: center;
+  }
+  #ruota.on { display: flex; }
+  .telefono {
+    width: 46px; height: 80px; border: 5px solid #fff; border-radius: 8px; position: relative;
+    box-shadow: 4px 4px 0 #555; animation: gira 2s steps(1) infinite;
+  }
+  .telefono::after { content: ""; position: absolute; left: 50%; bottom: 4px; width: 8px; height: 4px; margin-left: -4px; background: #fff; }
+  @keyframes gira { 0%, 40% { transform: rotate(0deg); } 50%, 90% { transform: rotate(-90deg); } }
+</style>
+</head>
+<body>
+<div id="scena">
+  <canvas id="gioco" width="384" height="216"></canvas>
+
+  <section class="schermo" id="titolo">
+    <h1>Un viaggio<br>inaspettato</h1>
+    <canvas class="lei" width="40" height="56"></canvas>
+    <div class="bottoni">
+      <button id="bInizia" type="button">Inizia</button>
+      <button id="bMusica" class="piccolo" type="button">&#9835; Musica: sì</button>
+    </div>
+  </section>
+
+  <section class="schermo" id="intro">
+    <canvas class="illus" width="384" height="216" data-illus="intro"></canvas>
+    <p class="riquadro" id="introTesto"></p>
+    <p class="nota">Tocca per saltare</p>
+  </section>
+
+  <section class="schermo" id="falo">
+    <canvas class="illus" width="384" height="216" data-illus="falo"></canvas>
+    <p class="riquadro" id="faloTesto"></p>
+    <p class="nota" id="faloNota">Tocca per continuare</p>
+  </section>
+
+  <section class="schermo" id="stanca">
+    <p class="grande">Basta, mi siedo.</p>
+    <p class="nota">Si riparte dall'inizio del giorno</p>
+  </section>
+
+  <section class="schermo" id="finale">
+    <canvas class="illus" width="384" height="216" data-illus="divano"></canvas>
+    <div class="pannello">
+      <h2>Casa dolce casa</h2>
+      <div class="riga">
+        <canvas class="lei" width="40" height="56"></canvas>
+        <ul id="riepilogo"></ul>
+      </div>
+      <p id="frase"></p>
+      <button id="bRigioca" type="button">Rigioca</button>
+    </div>
+  </section>
+
+  <section class="schermo" id="pausa">
+    <p class="grande">Pausa</p>
+    <p class="nota">Tocca per continuare</p>
+  </section>
+</div>
+
+<section id="ruota">
+  <div class="telefono"></div>
+  <p>Gira il telefono</p>
+</section>
+
+<script src="js/config.js"></script>
+<script src="js/player.js"></script>
+<script src="js/rules.js"></script>
+<script src="js/days.js"></script>
+<script src="js/world.js"></script>
+<script src="js/render.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/engine.js"></script>
+</body>
+</html>
