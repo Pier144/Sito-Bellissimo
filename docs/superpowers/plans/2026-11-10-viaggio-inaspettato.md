@@ -6,7 +6,7 @@
 
 **Architecture:** Script classici senza build, un namespace globale `VIAGGIO`. La logica pura (config, giocatrice, regole, giorni, mondo) non tocca DOM né canvas ed è testata con `node --test`; disegno, audio e motore stanno in file separati e si verificano nel browser. La grafica si genera con ComfyUI locale via API (script Python senza dipendenze) e si ripulisce con Pillow; il gioco funziona anche senza grafica grazie ai segnaposto colorati.
 
-**Tech Stack:** HTML5 canvas, JavaScript ES2020, WebAudio, Node 24 (`node --test`), Python 3.13 + Pillow 12, ComfyUI 0.44 su `127.0.0.1:8188`.
+**Tech Stack:** HTML5 canvas, JavaScript ES2020, WebAudio, Node 24 (`node --test`), Python 3.13 + Pillow 12, ComfyUI 0.44 (Desktop su 8188, server di test su 8189).
 
 **Spec:** `docs/superpowers/specs/2026-11-10-viaggio-inaspettato-design.md`
 
@@ -758,7 +758,19 @@ git commit -m "Viaggio: effetti 8-bit e musica chiptune"
 
 ## Chunk 2: Binario grafica e unione
 
-Prerequisito: ComfyUI desktop acceso su `127.0.0.1:8188`. Cartella ComfyUI: `C:/Users/piera/Documents/ComfyUI` (modelli in `models/`, input in `input/`, output in `output/`). Workflow utente salvati via API `/api/userdata/workflows%2F<nome>.json`.
+Regole ComfyUI dell'utente (memoria del progetto ComfyUI, vincolanti):
+- **Solo quanto richiesto**: nessun nodo o passaggio extra; nessun filtro né termine di contenuto nei negativi (solo qualità).
+- **Output dedicato**: ogni SaveImage salva in `output\<Nome workflow>\`. Prefissi: `Pixel Retro/<nome>` per i grafi pixel, `Viaggio Personaggio/<nome>` per Qwen Edit e Wan.
+- **AMD** RX 7900 XTX 24 GB, ROCm: niente dipendenze solo-CUDA, niente `pip install` dei requirements dei nodi.
+- **Server di test separato su porta 8189** con gli stessi argomenti del Desktop, fermato a fine lavoro. Configurazione `comfy-test` in `.claude/launch.json`, avvio con `preview_start`. Gli script usano `COMFY_URL` (default `http://127.0.0.1:8189`).
+- Gotcha AMD: la 2ª generazione con lo stesso modello residente è 10-20× più lenta. Chiamare `comfy.libera()` (`POST /free {"unload_models": true, "free_memory": true}`) tra un asset e l'altro e misurare i tempi della prima prova.
+
+Cartelle:
+- modelli: `C:/Users/piera/Documents/ComfyUI/models/`
+- input: `C:/Users/piera/Documents/ComfyUI/input/`
+- output: `C:/Users/piera/Documents/ComfyUI/output/`
+- workflow UI: `C:/Users/piera/ComfyUI-Installs/Main Install/ComfyUI/user/default/workflows/`
+- Python di ComfyUI: `C:/Users/piera/ComfyUI-Installs/Main Install/ComfyUI/.venv/Scripts/python.exe`
 
 ### Task G1: Preparazione (foto, gitignore, LoRA)
 
@@ -786,7 +798,7 @@ Leggi dimensione e nome del file da `https://huggingface.co/api/models/nerijs/pi
 curl -L -o "C:/Users/piera/Documents/ComfyUI/models/loras/pixel-art-xl.safetensors" "https://huggingface.co/nerijs/pixel-art-xl/resolve/main/pixel-art-xl.safetensors"
 ```
 
-Verifica che la dimensione corrisponda e che `curl -s http://127.0.0.1:8188/object_info/LoraLoader` elenchi `pixel-art-xl.safetensors`. Se non compare, chiedi all'utente di aggiornare la lista modelli in ComfyUI (R) o di riavviarlo.
+Verifica che la dimensione corrisponda e che `curl -s http://127.0.0.1:8189/object_info/LoraLoader` (server di test, avviato dopo il download) elenchi `pixel-art-xl.safetensors`. Per l'app Desktop dell'utente basta premere R nell'interfaccia.
 
 - [ ] **Step 4: Commit**
 
@@ -889,7 +901,7 @@ git commit -m "Viaggio: post-produzione pixel e sprite sheet"
 - [ ] **Step 1: Leggi le firme reali dei nodi**
 
 ```bash
-for n in CheckpointLoaderSimple LoraLoader KSampler ImageScale ImageQuantize LoadBackgroundRemovalModel RemoveBackground LoadImage VAEEncode SaveImage TextEncodeQwenImageEditPlus ModelSamplingAuraFlow CFGNorm UNETLoader CLIPLoader LoraLoaderModelOnly WanImageToVideo; do curl -s "http://127.0.0.1:8188/object_info/$n" > "$TEMP/obj_$n.json"; done
+for n in CheckpointLoaderSimple LoraLoader KSampler ImageScale ImageQuantize LoadBackgroundRemovalModel RemoveBackground LoadImage VAEEncode SaveImage TextEncodeQwenImageEditPlus ModelSamplingAuraFlow CFGNorm UNETLoader CLIPLoader LoraLoaderModelOnly WanImageToVideo; do curl -s "http://127.0.0.1:8189/object_info/$n" > "$TEMP/obj_$n.json"; done
 ```
 
 Usa questi file per i nomi esatti degli input (specie `RemoveBackground`, `TextEncodeQwenImageEditPlus`, `WanImageToVideo`). Per Qwen Edit copia la catena del workflow utente "Character Sheet Lustify" (`/api/userdata/workflows%2FCharacter%20Sheet%20Lustify.json`: UNETLoader `qwen_image_edit_2511_int8_convrot`, CLIPLoader `qwen_2.5_vl_7b_fp8_scaled`, VAE `qwen_image_vae`, LoRA Lightning 4 step, ModelSamplingAuraFlow, CFGNorm). Per Wan 2.2 i2v copia la catena del template ufficiale `video_wan2_2_14B_i2v` (high/low noise fp8 + LoRA lightx2v 4 step, VAE `wan_2.1_vae`, text encoder `umt5_xxl_fp8_e4m3fn_scaled`).
@@ -901,7 +913,8 @@ Usa questi file per i nomi esatti degli input (specie `RemoveBackground`, `TextE
 import json, time, uuid, urllib.request, urllib.parse
 from pathlib import Path
 
-BASE = "http://127.0.0.1:8188"
+import os
+BASE = os.environ.get("COMFY_URL", "http://127.0.0.1:8189")
 
 def _get(path):
     with urllib.request.urlopen(BASE + path, timeout=60) as r:
@@ -939,6 +952,12 @@ def esegui(grafo, attesa_max=1800):
         time.sleep(1.5)
     raise TimeoutError(pid)
 
+def libera():
+    """Scarica i modelli dalla VRAM (evita il rallentamento AMD alla 2a generazione)."""
+    req = urllib.request.Request(BASE + "/free", data=json.dumps({"unload_models": True, "free_memory": True}).encode(),
+                                 headers={"Content-Type": "application/json"})
+    urllib.request.urlopen(req, timeout=60).read()   # risposta vuota: niente json.loads
+
 def scarica(img, cartella):
     q = urllib.parse.urlencode({"filename": img["filename"], "subfolder": img["subfolder"], "type": img["type"]})
     dest = Path(cartella) / img["filename"]; dest.parent.mkdir(parents=True, exist_ok=True)
@@ -948,8 +967,10 @@ def scarica(img, cartella):
 
 - [ ] **Step 3: Scrivi `grafi.py`**
 
+Per la rimozione dello sfondo usa il core `RemoveBackground` se funziona su AMD, altrimenti `easy imageRemBg` (RMBG-1.4, già usato da Character Sheet Lustify).
+
 Funzioni che restituiscono dict in formato API (id nodo stringa → `{"class_type", "inputs"}`), con un piccolo helper `Grafo` che assegna gli id e collega gli output con `[id, indice]`:
-- `sprite(prompt, seed, larghezza=1024, altezza=1024, lato_px=48, colori=24, sfondo_via=True, prefisso="viaggio/sprite")`: CheckpointLoaderSimple `waiIllustriousSDXL_v170.safetensors` → LoraLoader `pixel-art-xl.safetensors` (forza 1.0/1.0) → CLIPTextEncode positivo `"pixel art, 16-bit sprite, side view, full body, simple white background, " + prompt` e negativo `"blurry, gradient, photo, 3d, text, watermark, multiple characters, cropped"` → EmptyLatentImage → KSampler (28 passi, cfg 6, `euler_ancestral`, `normal`) → VAEDecode → [RemoveBackground] → ImageScale `nearest-exact` a `lato_px` di altezza → ImageQuantize (`colori`, dither `none`) → ImageScale nearest ×8 (anteprima) → SaveImage `prefisso`. Salva anche il risultato a piena risoluzione con un secondo SaveImage `prefisso + "_hd"` (serve a pixelize.py, che rifà il passaggio in modo deterministico).
+- `sprite(prompt, seed, larghezza=1024, altezza=1024, lato_px=48, colori=24, sfondo_via=True, nome="sprite")`: CheckpointLoaderSimple `waiIllustriousSDXL_v170.safetensors` → LoraLoader `pixel-art-xl.safetensors` (forza 1.0/1.0) → CLIPTextEncode positivo `"pixel art, 16-bit sprite, side view, full body, simple white background, " + prompt` e negativo `"blurry, gradient, photo, 3d, text, watermark, multiple characters, cropped"` → EmptyLatentImage → KSampler (28 passi, cfg 6, `euler_ancestral`, `normal`) → VAEDecode → [RemoveBackground] → ImageScale `nearest-exact` a `lato_px` di altezza → ImageQuantize (`colori`, dither `none`) → ImageScale nearest ×8 (anteprima) → SaveImage `Pixel Retro/<nome>`. Salva anche il risultato a piena risoluzione con un secondo SaveImage `Pixel Retro/<nome>_hd` (serve a pixelize.py, che rifà il passaggio in modo deterministico).
 - `img2img(immagine, prompt, seed, denoise=0.55, ...)`: come `sprite` ma LoadImage → VAEEncode al posto di EmptyLatentImage.
 - `sfondo(prompt, seed, larghezza=1536, altezza=432, colori=32)`: come `sprite` senza rimozione sfondo; positivo `"pixel art, 16-bit game background, side-scrolling parallax layer, wide panorama, " + prompt`; downscale a 768×216.
 - `qwen_edit(immagini: list[str], prompt, seed, larghezza=1024, altezza=1024)`: catena Qwen Edit 2511 + Lightning (4 passi, cfg 1) con fino a 3 immagini di riferimento.
@@ -973,25 +994,25 @@ git commit -m "Viaggio: client ComfyUI e grafi di generazione"
 ### Task G4: Workflow "Pixel Retro" per l'interfaccia di ComfyUI
 
 **Files:**
-- Create: `viaggio/tools/comfy/workflow_ui.py`
+- Create: `viaggio/tools/comfy/workflow_ui.py` (prepara API + layout)
+- Create: `viaggio/tools/comfy/api_to_ui.js` (eseguito nel frontend, sul modello di `custom_nodes/comfyui-genera-3d/tools/api_to_ui.js`)
 
-- [ ] **Step 1: Scrivi `workflow_ui.py`**
+Stesso approccio già usato per "Genera 3D": la conversione nel formato UI la fa il frontend di ComfyUI.
 
-Converte i grafi `sprite`, `img2img` e `sfondo` di `grafi.py` in **un unico** workflow nel formato UI di ComfyUI (`{"last_node_id", "last_link_id", "nodes", "links", "groups", "version": 0.4}`), con tre gruppi colorati: "1 · Testo → Sprite", "2 · Immagine → Pixel", "3 · Sfondo panoramico". Il checkpoint, la LoRA e i prompt negativi sono condivisi.
-- Ordine dei `widgets_values` preso da `/object_info` (input `required` poi `optional` che non sono collegamenti); per gli INT chiamati `seed` aggiungi `"randomize"` subito dopo il valore.
-- Layout a colonne: x = 320 × profondità del nodo nel grafo, y in base al gruppo.
-- Nota di testo (nodo `Note`) in cima con le istruzioni in italiano: cosa fa ogni gruppo, quando usare `colori` e `lato_px`, e che i gruppi non usati si disattivano con Ctrl+B.
-- Salvataggio: `POST /api/userdata/workflows%2FPixel%20Retro.json?overwrite=true` con il JSON come corpo.
-
-- [ ] **Step 2: Genera e verifica**
-
-Run: `cd viaggio/tools/comfy && python workflow_ui.py` (senza `-I`: deve importare `grafi.py` dalla stessa cartella)
-Poi `curl -s "http://127.0.0.1:8188/api/userdata?dir=workflows"` deve elencare `Pixel Retro.json`. Chiedi all'utente di aprirlo in ComfyUI ed eseguire il gruppo 1. Se l'interfaccia segnala widget sbagliati, correggi l'ordine nel generatore.
-
-- [ ] **Step 3: Commit**
+- [ ] **Step 1: `workflow_ui.py`** unisce i grafi `sprite`, `img2img` e `sfondo` di `grafi.py` in **un unico** grafo API. Checkpoint e LoRA sono condivisi; ogni gruppo ha i suoi prompt e i suoi salvataggi in `Pixel Retro/`. Scrive `pixelretro_tmp/api.json` e `pixelretro_tmp/layout.json` (posizione e gruppo di ogni nodo) con `POST /api/userdata/pixelretro_tmp%2F<file>?overwrite=true`. Il layout è a colonne: x = 340 × profondità del nodo, y in base al gruppo.
+- [ ] **Step 2: `api_to_ui.js`** (nel browser integrato su `http://127.0.0.1:8189`, via `javascript_tool`):
+  - legge i due file con `fetch('/api/userdata/pixelretro_tmp%2Fapi.json')`;
+  - `await app.loadApiJson(api, "Pixel Retro")`;
+  - imposta posizione e titolo dei nodi e mette i seed su "randomize";
+  - crea tre `LGraphGroup` colorati: "1 · Testo → Sprite", "2 · Immagine → Pixel", "3 · Sfondo panoramico";
+  - aggiunge un nodo `Note` con le istruzioni in italiano: cosa fa ogni gruppo, cosa sono `colori` e `lato_px`, che i gruppi non usati si disattivano con Ctrl+B;
+  - `app.graph.serialize()` → `POST /api/userdata/workflows%2FPixel%20Retro.json?overwrite=true`.
+  La Note è documentazione, non un passaggio del grafo: se l'utente la considera un extra, si toglie.
+- [ ] **Step 3: Verifica**: riapri "Pixel Retro" dalla barra dei workflow su 8189 e fai uno screenshot. `graphToPrompt()` deve dare gli stessi nodi e valori di `api.json` (confronto in JS). Poi esegui una volta il gruppo 1 e controlla l'output in `output\Pixel Retro\`.
+- [ ] **Step 4: Commit**
 
 ```bash
-git add viaggio/tools/comfy/workflow_ui.py
+git add viaggio/tools/comfy/workflow_ui.py viaggio/tools/comfy/api_to_ui.js
 git commit -m "Viaggio: workflow ComfyUI Pixel Retro"
 ```
 
@@ -1026,7 +1047,7 @@ Genera 4 varianti in `_raw/sheet/`. **CHECKPOINT:** mandale all'utente (`SendUse
 
 - [ ] **Step 4: Pixel e sheet**
 
-Rimuovi lo sfondo (gruppo 2 del workflow con denoise 0, oppure `RemoveBackground` dal grafo `img2img`), poi:
+Rimuovi lo sfondo con lo stesso nodo usato in `grafi.sprite` (grafo dedicato `grafi.rimuovi_sfondo(immagine)` che salva in `Viaggio Personaggio/pulite/`), poi:
 
 ```bash
 python -I viaggio/tools/pixelize.py sheet --in viaggio/tools/_raw/lei_pulita --out viaggio/assets/sprites/lei.png --altezza 48 --colori 24 --contorno
