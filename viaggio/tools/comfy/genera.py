@@ -62,10 +62,12 @@ def genera_sfondo(bioma, strati, conf, seed):
         trasparente = strato != "lontano"
         prompt = strati[strato] + (", " + conf["strato_trasparente"] if trasparente else "")
         nome = f"{bioma}_{strato}"
-        hd = _hd(grafi.sfondo(nome, prompt, seed, rimuovi_sfondo=trasparente, hd_trasparente=trasparente),
+        hd = _hd(grafi.sfondo(nome, prompt, seed, out=(larg, alt), colori=colori, rimuovi_sfondo=trasparente,
+                              hd_trasparente=trasparente),
                  RAW / "sfondi" / nome)
         out = ASSETS / "bg" / f"{nome}.png"
-        args = ["sfondo", "--in", hd, "--out", out, "--larghezza", larg, "--altezza", alt, "--colori", colori]
+        args = ["sfondo", "--in", hd, "--out", out, "--larghezza", larg, "--altezza", alt, "--colori", colori,
+                "--banda", conf["banda_sfondo_px"]]
         if trasparente:
             args += ["--palette-da", ASSETS / "bg" / f"{bioma}_lontano.png"]
         pixelize(*args)

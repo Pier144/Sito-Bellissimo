@@ -54,7 +54,7 @@ def main():
         print(_genera(grafi.qwen_edit(a.nome, [base], a.prompt, a.seed), RAW / "pose"))
     elif a.modo == "cammina":
         base = comfy.carica(a.base)
-        print(_genera(grafi.wan_cammina("lei", base, CAMMINA, a.seed), RAW / "cammina"))
+        print(_genera(grafi.wan_cammina("lei", base, CAMMINA, a.seed, larghezza=480, altezza=720), RAW / "cammina"))
     else:
         for f in sorted(Path(a.cartella).glob("*.png")):
             nome = comfy.carica(f)

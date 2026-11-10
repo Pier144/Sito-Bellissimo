@@ -276,3 +276,17 @@ Due binari indipendenti; il codice non aspetta la grafica grazie ai segnaposto.
 - Montaggio grafica, bilanciamento, controllo che nel repo non ci siano foto
   originali (nessun file in `viaggio/` più grande di 300 KB né con dati EXIF),
   README.
+
+## Decisioni successive (2026-11-10, durante l'implementazione)
+
+- **Risoluzione di disegno 640×360** (non più 384×216): la logica resta nelle unità
+  384×216 (fisica, hitbox, giorni e test invariati), il disegno moltiplica per K = 5/3.
+  Gli sprite si disegnano 1:1 alla loro misura nativa, allineati in basso al centro della
+  hitbox.
+- **Lei alta circa 96 px**, palette da 32 colori. La base è la variante 1 di Qwen Edit,
+  scelta dall'utente.
+- **Stile pixel di lei: "ripasso d25"**: img2img del gruppo 2 di Pixel Retro con denoise
+  0.25, poi riduzione **BOX** (media dei blocchi, non nearest), palette e contorno. Il d40
+  e la riduzione nearest toglievano dettagli al viso.
+- **Sprite e sfondi** si scalano di conseguenza: altezze ×5/3, sfondi 1280×360 con banda
+  di ripetizione da 80 px e 48 colori.

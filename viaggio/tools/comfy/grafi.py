@@ -94,7 +94,7 @@ def img2img(nome, immagine, prompt, seed, denoise=0.55, **kw):
     return sprite(nome, prompt, seed, immagine=immagine, denoise=denoise, **kw)
 
 
-def sfondo(nome, prompt, seed, larghezza=1536, altezza=432, out=(768, 216), colori=32, rimuovi_sfondo=False,
+def sfondo(nome, prompt, seed, larghezza=1856, altezza=512, out=(1280, 360), colori=48, rimuovi_sfondo=False,
            hd_trasparente=False):
     g = Grafo()
     ckpt, lora, clip = _base_sdxl(g)

@@ -32,18 +32,20 @@ def soglia_alpha(img, soglia=128):
 
 
 def pixellizza(img, altezza=None, dimensioni=None):
-    """Ritaglia al contenuto opaco e ridimensiona con NEAREST.
+    """Ritaglia al contenuto opaco e riduce con BOX (media di ogni blocco), poi alpha netta.
 
+    BOX invece di NEAREST: con riduzioni forti (~13-25x) NEAREST prende un pixel a caso per blocco e
+    il viso si riempie di rumore; la media tiene occhi e righe leggibili (provato il 2026-11-10).
     Con `altezza` mantiene le proporzioni; con `dimensioni=(w, h)` forza la misura (sfondi).
     """
-    img = soglia_alpha(img)
+    img = img.convert("RGBA")
     if dimensioni:
-        return img.resize(dimensioni, Image.NEAREST)
-    box = img.getchannel("A").getbbox()
+        return soglia_alpha(img.resize(dimensioni, Image.BOX), 110)
+    box = soglia_alpha(img).getchannel("A").getbbox()
     if box:
         img = img.crop(box)
     larghezza = max(1, round(img.width * altezza / img.height))
-    return img.resize((larghezza, altezza), Image.NEAREST)
+    return soglia_alpha(img.resize((larghezza, altezza), Image.BOX), 110)
 
 
 def _pixel_opachi(immagini):
@@ -182,7 +184,7 @@ def main(argv=None):
         print(json.dumps(meta))
     else:
         img = _immagini(a.ingresso)[0].convert("RGBA")
-        img = img.resize((a.larghezza + a.banda, a.altezza), Image.NEAREST)
+        img = img.resize((a.larghezza + a.banda, a.altezza), Image.BOX)
         img = ripetibile(img, a.banda)
         img = soglia_alpha(img)
         pal = estrai_palette([Image.open(a.palette_da)] if a.palette_da else [img], a.colori)

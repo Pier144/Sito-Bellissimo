@@ -13,6 +13,16 @@ class T(unittest.TestCase):
         out = px.pixellizza(im, 48)
         self.assertEqual(out.height, 48); self.assertEqual(out.width, 24)
 
+    def test_pixellizza_media_non_campione(self):
+        # scacchiera fine rosso/blu: con BOX ogni pixel finale è la media (viola), non un campione a caso
+        im = Image.new("RGBA", (64, 64))
+        for y in range(64):
+            for x in range(64):
+                im.putpixel((x, y), (255, 0, 0, 255) if (x + y) % 2 else (0, 0, 255, 255))
+        out = px.pixellizza(im, 8)
+        r, g, b, a = out.getpixel((3, 3))
+        self.assertTrue(100 < r < 160 and 100 < b < 160, (r, g, b))
+
     def test_palette_comune(self):
         a = Image.new("RGBA", (4, 4), (250, 10, 10, 255)); b = Image.new("RGBA", (4, 4), (10, 10, 250, 255))
         pal = px.estrai_palette([a, b], 2)
