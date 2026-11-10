@@ -165,7 +165,7 @@
       if (c.illus) V.disegnaIllustrazione(c.ctx, c.illus, orologio);
       else {
         c.ctx.clearRect(0, 0, c.el.width, c.el.height);
-        V.disegnaLei(c.ctx, c.el.width / 2, c.el.height - 2, { anim: 'bacino', i: Math.floor(orologio * 3) % 2 }, orologio);
+        V.disegnaLei(c.ctx, c.el.width / 2 / V.K, (c.el.height - 2) / V.K, { anim: 'bacino', i: Math.floor(orologio * 3) % 2 }, orologio);
       }
     }
   }
@@ -206,16 +206,17 @@
 
   function ridimensiona() {
     const w = window.innerWidth, h = window.innerHeight;
-    const dpr = window.devicePixelRatio || 1, fit = Math.min(w / V.W, h / V.H);
+    // si scala il canvas reale (V.RW x V.RH); la logica resta in unità V.W x V.H
+    const dpr = window.devicePixelRatio || 1, fit = Math.min(w / V.RW, h / V.RH);
     // ogni pixel logico = un numero intero di pixel del dispositivo
     let s = Math.max(1, Math.floor(fit * dpr)) / dpr;
     // se così resta più del 30% vuoto, scala frazionaria (meglio pixel non uniformi che gioco minuscolo)
     if (s > fit || 1 - s / fit > 0.3) s = fit;
     const px = v => Math.round(v * dpr) / dpr;   // allinea ai pixel del dispositivo
-    const sc = $('scena'), cw = px(V.W * s), ch = px(V.H * s);
+    const sc = $('scena'), cw = px(V.RW * s), ch = px(V.RH * s);
     sc.style.width = cw + 'px'; sc.style.height = ch + 'px';
     sc.style.left = px((w - cw) / 2) + 'px'; sc.style.top = px((h - ch) / 2) + 'px';
-    sc.style.setProperty('--s', s.toFixed(4));
+    sc.style.setProperty('--s', (s * V.K).toFixed(4));   // px CSS per unità logica (testi e bordi DOM)
     controllaOrientamento();
   }
 

@@ -21,8 +21,8 @@
   }
   button { font: inherit; color: inherit; text-shadow: inherit; }
 
-  /* scena: canvas logico 384x216 scalato da engine.js (--s = scala) */
-  #scena { position: absolute; left: 0; top: 0; width: 384px; height: 216px; --s: 1; overflow: hidden; }
+  /* scena: canvas 640x360 (logica 384x216) scalato da engine.js; --s = px CSS per unità logica */
+  #scena { position: absolute; left: 0; top: 0; width: 640px; height: 360px; --s: 1.6667; overflow: hidden; }
   #gioco, canvas.illus, canvas.lei {
     display: block;
     image-rendering: -moz-crisp-edges;
@@ -40,7 +40,7 @@
   .schermo.on { display: flex; }
   .schermo p { margin: 0; }
   canvas.illus { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
-  canvas.lei { width: calc(var(--s) * 40px); height: calc(var(--s) * 56px); }
+  canvas.lei { width: calc(var(--s) * 48px); height: calc(var(--s) * 67.2px); }   /* 80x112 px reali */
 
   h1, h2 { margin: 0; line-height: 1.05; letter-spacing: .04em; }
   h1 { font-size: 2.6em; color: #ffe08a; text-shadow: 3px 3px 0 #7a2f1c, 5px 5px 0 #000; }
@@ -96,11 +96,11 @@
 </head>
 <body>
 <div id="scena">
-  <canvas id="gioco" width="384" height="216"></canvas>
+  <canvas id="gioco" width="640" height="360"></canvas>
 
   <section class="schermo" id="titolo">
     <h1>Un viaggio<br>inaspettato</h1>
-    <canvas class="lei" width="40" height="56"></canvas>
+    <canvas class="lei" width="80" height="112"></canvas>
     <div class="bottoni">
       <button id="bInizia" type="button">Inizia</button>
       <button id="bMusica" class="piccolo" type="button">&#9835; Musica: sì</button>
@@ -108,13 +108,13 @@
   </section>
 
   <section class="schermo" id="intro">
-    <canvas class="illus" width="384" height="216" data-illus="intro"></canvas>
+    <canvas class="illus" width="640" height="360" data-illus="intro"></canvas>
     <p class="riquadro" id="introTesto"></p>
     <p class="nota">Tocca per saltare</p>
   </section>
 
   <section class="schermo" id="falo">
-    <canvas class="illus" width="384" height="216" data-illus="falo"></canvas>
+    <canvas class="illus" width="640" height="360" data-illus="falo"></canvas>
     <p class="riquadro" id="faloTesto"></p>
     <p class="nota" id="faloNota">Tocca per continuare</p>
   </section>
@@ -125,11 +125,11 @@
   </section>
 
   <section class="schermo" id="finale">
-    <canvas class="illus" width="384" height="216" data-illus="divano"></canvas>
+    <canvas class="illus" width="640" height="360" data-illus="divano"></canvas>
     <div class="pannello">
       <h2>Casa dolce casa</h2>
       <div class="riga">
-        <canvas class="lei" width="40" height="56"></canvas>
+        <canvas class="lei" width="80" height="112"></canvas>
         <ul id="riepilogo"></ul>
       </div>
       <p id="frase"></p>
