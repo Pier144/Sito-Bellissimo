@@ -1,1 +1,37 @@
-{"sprites":{},"sfondi":{},"illustrazioni":{}}
+{
+  "sprites": {
+    "lei": {
+      "file": "sprites/lei.png",
+      "fw": 66,
+      "fh": 102,
+      "righe": {
+        "bacino": [
+          0,
+          2
+        ],
+        "cammina": [
+          1,
+          8
+        ],
+        "colpita": [
+          2,
+          1
+        ],
+        "pisolino": [
+          3,
+          2
+        ],
+        "salto": [
+          4,
+          2
+        ],
+        "stanca": [
+          5,
+          2
+        ]
+      }
+    }
+  },
+  "sfondi": {},
+  "illustrazioni": {}
+}

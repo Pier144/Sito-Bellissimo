@@ -173,6 +173,8 @@ def main(argv=None):
     ap.add_argument("--contorno", action="store_true")
     ap.add_argument("--palette-da", help="riusa la palette di questa immagine (sfondi dello stesso bioma)")
     ap.add_argument("--riferimento", help="sheet: la scala comune si calcola solo su questa animazione (es. cammina)")
+    ap.add_argument("--altezze", default="", help="sheet: altezza del fotogramma più alto per animazione, "
+                    "es. 'stanca=62,pisolino=24' (pose generate con inquadrature diverse)")
     a = ap.parse_args(argv)
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -187,7 +189,9 @@ def main(argv=None):
         sorgenti = {d.name: _immagini(d) for d in cartelle}
         base = sorgenti[a.riferimento] if a.riferimento else [i for l in sorgenti.values() for i in l]
         f = scala_comune(base, a.altezza)   # una scala per tutti: niente "pulsazioni" tra i fotogrammi
-        righe = {k: [pixellizza(i, scala=f) for i in l] for k, l in sorgenti.items()}
+        alt = dict((k, int(v)) for k, v in (x.split("=") for x in a.altezze.split(",") if x))
+        righe = {k: [pixellizza(i, scala=scala_comune(l, alt[k]) if k in alt else f) for i in l]
+                 for k, l in sorgenti.items()}
         pal = estrai_palette([f for l in righe.values() for f in l], a.colori)
         righe = {k: [_finisci(f, pal, a.contorno) for f in l] for k, l in righe.items()}
         sheet, meta = monta_sheet(righe)

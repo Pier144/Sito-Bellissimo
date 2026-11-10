@@ -36,8 +36,9 @@ POSA_BASE = ("Same girl, same face, same hairstyle, same outfit and same art sty
 POSE = {
     "salto": ["Side view facing right. She is jumping up in mid-air: knees bent and tucked, arms raised up, happy.",
               "Side view facing right. She is coming down from a jump in mid-air: legs stretched down, arms up."],
-    "colpita": ["Side view facing right. She just bumped into something: leaning backwards, arms flailing, "
-                "eyes squeezed shut, surprised."],
+    "colpita": ["Side view facing right, nothing else in the image. She stumbles backwards after tripping: body "
+                "leaning back, both arms thrown up and back for balance, one foot lifted, eyes squeezed shut, "
+                "comic 'ouch' face."],
     "stanca": ["Side view facing right. She sits on the ground exhausted, legs stretched forward, leaning back on "
                "her hands, puffing her cheeks, tired face.",
                "Side view facing right. She sits on the ground exhausted, legs stretched forward, leaning back on "
