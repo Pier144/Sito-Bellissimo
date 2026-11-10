@@ -12,16 +12,16 @@
   V.FINESTRA_AZIONE = 150;             // px davanti a lei in cui l'azione è possibile (~1.5 s)
   V.FRAMES = { cammina: 8, salto: 2, colpita: 1, stanca: 2, pisolino: 2, bacino: 2 };
   V.ENTITA = {                         // hitbox; y = altezza da terra del bordo inferiore
-    gallina: { w: 14, h: 14 }, pozzanghera: { w: 24, h: 4 }, mucca: { w: 36, h: 22 },
-    trattore: { w: 40, h: 24 }, cane: { w: 20, h: 16 }, scoiattolo: { w: 12, h: 12 },
-    radice: { w: 20, h: 8 }, fungo: { w: 10, h: 12 }, capra: { w: 22, h: 20 },
-    sasso: { w: 14, h: 14 }, cespuglio: { w: 16, h: 16 }, fulmine: { w: 16, h: 6 },
-    monopattino: { w: 24, h: 18 }, piccione: { w: 14, h: 10 }, bus: { w: 60, h: 24 },
+    gallina: { w: 14, h: 14 }, pozzanghera: { w: 16, h: 4 }, mucca: { w: 56, h: 20 },
+    trattore: { w: 44, h: 24 }, cane: { w: 22, h: 16 }, scoiattolo: { w: 14, h: 12 },
+    radice: { w: 20, h: 9 }, fungo: { w: 12, h: 12 }, capra: { w: 20, h: 21 },
+    sasso: { w: 15, h: 14 }, cespuglio: { w: 18, h: 15 }, fulmine: { w: 16, h: 6 },
+    monopattino: { w: 14, h: 19 }, piccione: { w: 14, h: 10 }, bus: { w: 60, h: 26 },
     snack: { w: 12, h: 12 }, grappolo: { w: 12, h: 12 }, panchina: { w: 30, h: 14 },
     fonte: { w: 18, h: 14 }, ombrello: { w: 14, h: 14 },
     paperella: { w: 12, h: 12 }, cuffia: { w: 12, h: 12 }, accappatoio: { w: 12, h: 12 },
     ciabatta: { w: 12, h: 12 }, telo: { w: 12, h: 12 }, braccialetto: { w: 12, h: 12 },
-    cartello: { w: 16, h: 30 }, porta: { w: 30, h: 50 }
+    cartello: { w: 16, h: 30 }, porta: { w: 38, h: 50 }
   };
   V.RICORDI = ['paperella', 'cuffia', 'accappatoio', 'ciabatta', 'telo', 'braccialetto'];
   V.velocitaGiorno = n => 90 + (n - 1) * 6;   // px/s, giorno 1..6 -> 90..120

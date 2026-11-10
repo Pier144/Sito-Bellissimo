@@ -68,7 +68,7 @@
     },
     "radice": {
       "file": "sprites/radice.png",
-      "w": 16,
+      "w": 38,
       "h": 19
     },
     "fungo": {
@@ -93,7 +93,7 @@
     },
     "monopattino": {
       "file": "sprites/monopattino.png",
-      "w": 53,
+      "w": 29,
       "h": 39
     },
     "piccione": {
@@ -108,7 +108,7 @@
     },
     "snack": {
       "file": "sprites/snack.png",
-      "w": 26,
+      "w": 11,
       "h": 22
     },
     "grappolo": {
@@ -138,13 +138,13 @@
     },
     "cuffia": {
       "file": "sprites/cuffia.png",
-      "w": 25,
+      "w": 33,
       "h": 22
     },
     "ciabatta": {
       "file": "sprites/ciabatta.png",
-      "w": 25,
-      "h": 19
+      "w": 15,
+      "h": 14
     },
     "telo": {
       "file": "sprites/telo.png",
@@ -153,7 +153,7 @@
     },
     "braccialetto": {
       "file": "sprites/braccialetto.png",
-      "w": 9,
+      "w": 7,
       "h": 19
     },
     "cartello": {
@@ -177,6 +177,25 @@
       "h": 109
     }
   },
-  "sfondi": {},
+  "sfondi": {
+    "campi": {
+      "lontano": "bg/campi_lontano.png"
+    },
+    "vigneti": {
+      "lontano": "bg/vigneti_lontano.png"
+    },
+    "bosco": {
+      "lontano": "bg/bosco_lontano.png"
+    },
+    "montagna": {
+      "lontano": "bg/montagna_lontano.png"
+    },
+    "temporale": {
+      "lontano": "bg/temporale_lontano.png"
+    },
+    "periferia": {
+      "lontano": "bg/periferia_lontano.png"
+    }
+  },
   "illustrazioni": {}
 }

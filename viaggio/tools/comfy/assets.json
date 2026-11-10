@@ -181,8 +181,8 @@
       "prompt": "large blue sky with soft white clouds, distant small rolling green hills, tiny farmhouses and poplar trees far away, italian countryside, daytime"
     },
     "vigneti": {
-      "seed": 11,
-      "prompt": "warm golden afternoon sky, distant gentle hills covered with vineyard rows, cypress trees, a small hilltop village far away, tuscany"
+      "seed": 21,
+      "prompt": "clear blue sky, sunny afternoon, distant gentle green hills covered with neat rows of grapevines, cypress trees, a small hilltop village far away, tuscany"
     },
     "bosco": {
       "seed": 11,
@@ -193,8 +193,8 @@
       "prompt": "clear cold sky, distant snowy alpine peaks, rocky slopes with scattered pine trees, alpine meadow far away"
     },
     "temporale": {
-      "seed": 11,
-      "prompt": "dark stormy sky with heavy grey clouds, rain, flat plains, wind-bent trees far away, gloomy"
+      "seed": 21,
+      "prompt": "overcast stormy sky with heavy dark grey clouds, distant flat green plains, a lone farmhouse and a few trees far away, lightning far in the distance, dim light"
     },
     "periferia": {
       "seed": 11,
@@ -208,5 +208,19 @@
   "prefisso_sprite": "pixel art, sprite, no humans, single object, simple background, grey background, full body, side view, ",
   "prefisso_sfondo": "scenery, no humans, wide landscape, low horizon, pastel colors, simple shapes, flat colors, calm, ",
   "pixel_sfondo": 2,
-  "foschia_sfondo": 0.25
+  "foschia_sfondo": 0.25,
+  "illustrazioni": {
+    "intro": {
+      "seed": 1,
+      "prompt": "Same girl, same face and curly ponytail as the reference image, cute anime style, wide 16:9 scene, she is small in the frame. She walks out of a thermal spa building with steam rising from outdoor hot pools, wearing a white fluffy bathrobe and a swim cap, relaxed smile. A wooden road sign next to her points right and reads 'Casa'. Sunny afternoon, green hills behind."
+    },
+    "falo": {
+      "seed": 1,
+      "prompt": "Same girl, same face and curly ponytail as the reference image, cute anime style, wide 16:9 scene, she is small in the frame. Night scene: she sits on a log next to a small campfire in a meadow, wearing her black and white striped sweater and jeans, writing in a small diary. Starry sky, warm firelight on her face, dark trees around."
+    },
+    "divano": {
+      "seed": 1,
+      "prompt": "Same girl, same face and curly ponytail as the reference image, cute anime style, wide 16:9 scene, she is small in the frame. Inside a cozy living room at home: she lies on a sofa fast asleep and happy, wearing her black and white striped sweater and jeans, shoes kicked off on the floor, a blanket, a plush toy, warm lamp light, the front door open behind her."
+    }
+  }
 }

@@ -67,6 +67,28 @@ def genera_sfondo(bioma, voce, conf, seed=None):
     print(nome)
 
 
+def genera_illustrazione(nome, voce, seed=None):
+    """Qwen Edit dalla base di lei -> ripasso pixel d25 -> 640x360, 32 colori."""
+    seed = seed or voce.get("seed", 1)
+    base = comfy.carica(RAW / "base_lei.png")
+    scena = _qwen(grafi.qwen_edit(f"illustrazione_{nome}", [base], voce["prompt"], seed, larghezza=1280, altezza=720),
+                  RAW / "illustrazioni" / nome)
+    img = comfy.carica(scena, "viaggio_illus")
+    hd = _hd(grafi.img2img(f"illustrazione_{nome}_pixel", img, "scenery, cozy, " + voce["prompt"][:300], seed,
+                           denoise=0.25, rimuovi_sfondo=False, lato_px=360, colori=32), RAW / "illustrazioni" / nome)
+    out = ASSETS / "illustrazioni" / f"{nome}.png"
+    pixelize("sfondo", "--in", hd, "--out", out, "--larghezza", 640, "--altezza", 360, "--colori", 32, "--banda", 0)
+    aggiorna_manifest("illustrazioni", nome, f"illustrazioni/{nome}.png")
+    print(nome)
+
+
+def _qwen(grafo, cartella):
+    imgs = comfy.esegui(grafo)
+    f = comfy.scarica(imgs[0], cartella)
+    comfy.libera()
+    return f
+
+
 def contact():
     """Un PNG per tipo con tutti gli asset affiancati e ingranditi, per la revisione."""
     for tipo, cartella, scala in (("sprite", ASSETS / "sprites", 4), ("sfondi", ASSETS / "bg", 1)):
@@ -89,7 +111,7 @@ def contact():
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser()
-    ap.add_argument("--tipo", choices=["sprite", "sfondi", "contact"], required=True)
+    ap.add_argument("--tipo", choices=["sprite", "sfondi", "illustrazioni", "contact"], required=True)
     ap.add_argument("--solo", default="")
     ap.add_argument("--seed", type=int, default=1)
     a = ap.parse_args()
@@ -104,6 +126,10 @@ def main():
             if not solo or bioma in solo:
                 genera_sfondo(bioma, dict(voce, prompt=conf["prefisso_sfondo"] + voce["prompt"]), conf,
                               a.seed if a.seed != 1 else None)
+    elif a.tipo == "illustrazioni":
+        for nome, voce in conf["illustrazioni"].items():
+            if not solo or nome in solo:
+                genera_illustrazione(nome, voce, a.seed if a.seed != 1 else None)
     else:
         contact()
 
