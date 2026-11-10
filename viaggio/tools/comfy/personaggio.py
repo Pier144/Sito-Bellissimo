@@ -4,6 +4,7 @@
   python personaggio.py posa --base FILE --nome salto_1 --seed 1 --prompt "..."
   python personaggio.py cammina --base FILE --seed 1
   python personaggio.py pulisci --cartella DIR
+  python personaggio.py ripassa --cartella DIR --nome cammina [--prompt "walking pose"]
 
 Le foto originali stanno solo in ComfyUI input/viaggio/ (mai nel repo).
 """
@@ -23,6 +24,12 @@ SHEET = ("Turn the woman from the reference photos into a cute anime-style video
          "hoop earrings. Outfit: black and white horizontally striped cropped sweater, light blue jeans, white "
          "sneakers. Dark red nail polish. Chibi proportions, 3 heads tall.")
 
+# Ripasso pixel scelto dall'utente: d25 sulla variante 1 (vedi spec, "Decisioni successive")
+RIPASSO = ("girl with long very dark brown curly hair in a ponytail, small hoop earrings, black and white striped "
+           "cropped sweater, light blue jeans, white sneakers")
+RIPASSO_DENOISE = 0.25
+RIPASSO_SEED = 7
+
 CAMMINA = ("the girl walks in place to the right, side view, steady camera, plain white background, "
            "looping walk cycle")
 
@@ -36,7 +43,7 @@ def _genera(grafo, cartella):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("modo", choices=["sheet", "posa", "cammina", "pulisci"])
+    ap.add_argument("modo", choices=["sheet", "posa", "cammina", "pulisci", "ripassa"])
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--quanti", type=int, default=4)
     ap.add_argument("--base")
@@ -55,6 +62,18 @@ def main():
     elif a.modo == "cammina":
         base = comfy.carica(a.base)
         print(_genera(grafi.wan_cammina("lei", base, CAMMINA, a.seed, larghezza=480, altezza=720), RAW / "cammina"))
+    elif a.modo == "ripassa":
+        # ogni fotogramma di --cartella -> ripasso d25 + scontorno -> _raw/ripassati/<--nome>/
+        for f in sorted(Path(a.cartella).glob("*.png")):
+            img = comfy.carica(f, "viaggio_frame")
+            grafo = grafi.img2img(f"ripasso_{a.nome}_{f.stem}", img, RIPASSO + (", " + a.prompt if a.prompt else ""),
+                                  RIPASSO_SEED, denoise=RIPASSO_DENOISE, lato_px=96, colori=32, hd_trasparente=True)
+            imgs = comfy.esegui(grafo)
+            hd = [i for i in imgs if "_hd_" in i["filename"]][0]
+            dest = comfy.scarica(hd, RAW / "ripassati" / a.nome)
+            dest.replace(dest.with_name(f.stem + ".png"))   # replace: su Windows rename fallisce se esiste
+            comfy.libera()
+            print(f.name)
     else:
         for f in sorted(Path(a.cartella).glob("*.png")):
             nome = comfy.carica(f)
